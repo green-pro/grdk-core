@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  web:
+    image: "google/cadvisor:latest"
+    hostname: 'monitor.grdk'
+    volumes:
+    - "/:/rootfs:ro"
+    - "/var/run:/var/run:rw"
+    - "/sys:/sys:ro"
+    - "/var/lib/docker/:/var/lib/docker:ro"
+    ports:
+      - "8001:8080"
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure

@@ -1,0 +1,16 @@
+version: "3.3"
+
+services:
+  web:
+    container_name: grdk-proxy
+    image: "{{ DK_REPO_DI_HOST }}:5000/grdk-proxy:latest"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    logging:
+      driver: gelf
+      options:
+        gelf-address: "udp://{{ DK_LOGGER_HOST }}:12201"
+        tag: "GRDK_PROXY"
+    restart: always

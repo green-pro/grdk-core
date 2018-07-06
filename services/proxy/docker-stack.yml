@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  web:
+    image: "repo-di.grdk:5000/grdk-proxy:latest"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure

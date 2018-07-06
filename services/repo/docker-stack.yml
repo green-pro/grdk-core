@@ -1,0 +1,70 @@
+version: "3.4"
+
+volumes:
+  glconf:
+    driver: nfs
+    driver_opts:
+      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/glconf"
+  gllog:
+    driver: nfs
+    driver_opts:
+      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/gllog"
+  gldata:
+    driver: nfs
+    driver_opts:
+      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/gldata"
+  glr1conf:
+    driver: nfs
+    driver_opts:
+      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/glr1conf"
+  didata:
+    driver: nfs
+    driver_opts:
+      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/didata"
+
+services:
+  web:
+    image: "gitlab/gitlab-ce:10.8.4-ce.0"
+    volumes:
+      - glconf:/etc/gitlab
+      - gllog:/var/log/gitlab
+      - gldata:/var/opt/gitlab
+    hostname: '{{ DK_REPO_HOST }}'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://{{ DK_REPO_HOST }}:8000'
+        gitlab_rails['gitlab_shell_ssh_port'] = 2200
+    ports:
+      - "8000:8000"
+      - "2200:22"
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+
+  runner-1:
+    image: "gitlab/gitlab-runner:v10.8.0"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - glr1conf:/etc/gitlab-runner
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+
+  di:
+    image: "registry:2"
+    volumes:
+      - didata:/var/lib/registry
+    ports:
+      - "5000:5000"
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
