@@ -8,6 +8,8 @@ source ./environment.sh
 # check nfs
 # check internet
 
+source ./vendor/grdk-core/grdk-preload-images.sh
+
 read -p "Confirma START UP dos serviços L1 ? [Y|n] " answer
 if [ $answer != "Y" ]; then
 	exit 1
