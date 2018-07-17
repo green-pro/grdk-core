@@ -3,18 +3,15 @@
 echo "STEP2 - START"
 
 ### CHECK REQUIREMENTS
-if [ ! "$(docker ps -q -f name=grdk-repo_web)" ]; then
-    echo "GRDK-REPO - Not Found"
-    exit 1
+set +e
+grdk_containers_checkup grdk-repo_ 100 3
+if [ $? = 1 ]; then
+	echo "GRDK-REPO - OK"
 else
-    echo "GRDK-REPO - OK"
-    if [ ! "$(docker ps -q -f name=grdk-repo_di)" ]; then
-        echo "GRDK-REPO-DI - Not Found"
-        exit 1
-    else
-        echo "GRDK-REPO-DI - OK"
-    fi
+	echo "GRDK-REPO - Not Found"
+	exit 1
 fi
+set -e
 
 ### GRDK-MSG-BUILD
 if curl --location --silent --fail "http://${DK_REPO_DI_HOST}:5000/v2/grdk-msg/tags/list" > /dev/null

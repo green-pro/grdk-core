@@ -19,7 +19,6 @@ else
 		< ./vendor/grdk-core/services/repo/docker-stack.yml \
 		> ./vendor/grdk-core/services/repo/_docker-stack.yml
 	docker stack deploy --compose-file  ./vendor/grdk-core/services/repo/_docker-stack.yml grdk-repo
-	echo "Atencao: Aguarde a inicializacao completa do GRDK-REPO para prosseguir"
 fi
 
 echo "STEP1 - END"
