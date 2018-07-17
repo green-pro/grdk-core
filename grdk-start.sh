@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ./environment.sh
+source ./vendor/grdk-core/lib/include-functions.sh
 
 ### TODO
 # check nodes
