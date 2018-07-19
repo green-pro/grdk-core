@@ -10,6 +10,7 @@ fi
 # DEFAULT ENV VARS
 DK_INSTALL_TYPE="empty"
 DK_INSTALL_PATH="${curr_dir}"
+DK_BUILD_PATH="${curr_dir}/build"
 DK_SERVER_NODE_ROLE="empty"
 DK_SERVER_IP="192.168.0.1"
 DK_SERVER_INST_NFS="Y"
@@ -64,6 +65,7 @@ if [ "$DK_INSTALL_TYPE" = "M" ]; then
 	cat > ./environment.sh << EOF
 #!/bin/bash
 export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
+export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
 export DK_SERVER_IP="${DK_SERVER_IP}"
 export DK_SERVER_INST_NFS="${DK_SERVER_INST_NFS}"
@@ -78,9 +80,9 @@ EOF
 	source ./environment.sh
 
 	if [ -f "./environment.sh" ]; then
-		sed '/^DK_/ d' < /etc/environment > ./build/environment
-		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> ./build/environment
-		cp ./build/environment /etc/environment
+		sed '/^DK_/ d' < /etc/environment > $DK_BUILD_PATH/environment
+		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> $DK_BUILD_PATH/environment
+		cp $DK_BUILD_PATH/environment /etc/environment
 	fi
 
 	echo ""
@@ -113,6 +115,7 @@ elif [ "$DK_INSTALL_TYPE" = "w" ]; then
 	cat > ./environment.sh << EOF
 #!/bin/bash
 export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
+export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
 export DK_SERVER_IP="${DK_SERVER_IP}"
 export DK_REPO_HOST="${DK_REPO_HOST}"
@@ -123,9 +126,9 @@ EOF
 	source ./environment.sh
 
 	if [ -f "./environment.sh" ]; then
-		sed '/^DK_/ d' < /etc/environment > ./build/environment
-		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> ./build/environment
-		cp ./build/environment /etc/environment
+		sed '/^DK_/ d' < /etc/environment > $DK_BUILD_PATH/environment
+		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> $DK_BUILD_PATH/environment
+		cp $DK_BUILD_PATH/environment /etc/environment
 	fi
 
 	echo ""
