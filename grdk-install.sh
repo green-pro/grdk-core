@@ -3,6 +3,10 @@ set -e
 
 curr_dir="$(pwd)"
 
+if [ ! -d "./build" ]; then
+	mkdir -p ./build
+fi
+
 # DEFAULT ENV VARS
 DK_INSTALL_TYPE="empty"
 DK_INSTALL_PATH="${curr_dir}"
@@ -74,9 +78,9 @@ EOF
 	source ./environment.sh
 
 	if [ -f "./environment.sh" ]; then
-		sed '/^DK_/ d' < /etc/environment > /etc/_environment
-		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> /etc/_environment
-		mv /etc/_environment /etc/environment
+		sed '/^DK_/ d' < /etc/environment > ./build/environment
+		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> ./build/environment
+		cp ./build/environment /etc/environment
 	fi
 
 	echo ""
@@ -119,9 +123,9 @@ EOF
 	source ./environment.sh
 
 	if [ -f "./environment.sh" ]; then
-		sed '/^DK_/ d' < /etc/environment > /etc/_environment
-		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> /etc/_environment
-		mv /etc/_environment /etc/environment
+		sed '/^DK_/ d' < /etc/environment > ./build/environment
+		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> ./build/environment
+		cp ./build/environment /etc/environment
 	fi
 
 	echo ""
