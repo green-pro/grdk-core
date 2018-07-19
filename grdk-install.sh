@@ -3,146 +3,143 @@ set -e
 
 curr_dir="$(pwd)"
 
-echo "Install for Docker \"MANAGER\" or \"WORKER\"? [M|w]"
-read type_install
+# DEFAULT ENV VARS
+DK_INSTALL_TYPE="empty"
+DK_INSTALL_PATH="${curr_dir}"
+DK_SERVER_NODE_ROLE="empty"
+DK_SERVER_IP="192.168.0.1"
+DK_SERVER_INST_NFS="Y"
+DK_LOGGER_HOST="logger.domain"
+DK_REPO_HOST="repo.domain"
+DK_REPO_NFS_HOST="storage-1.domain"
+DK_REPO_NFS_PATH="/mnt/storage-1/grdk-repo"
+DK_REPO_DI_HOST="repo-di.domain"
+DK_MSG_HOST="msg.domain"
+DK_MSG_GITLAB_WH_TK="secret"
+DK_SWARM_IP="192.168.0.1"
+DK_SWARM_TOKEN="secret"
+
+if [ -f "./environment.sh" ]; then
+	source ./environment.sh
+fi
+
+read -p "Install Docker \"MANAGER\" or \"WORKER\"? (M/w) " -e answer
+DK_INSTALL_TYPE=${answer:-${DK_INSTALL_TYPE}}
+if [ "$DK_INSTALL_TYPE" = "M" ]; then
+	DK_SERVER_NODE_ROLE="manager"
+elif [ "$DK_INSTALL_TYPE" = "w" ]; then
+	DK_SERVER_NODE_ROLE="worker"
+else
+	echo "Nothing selected: \"M\" for DOCKER MANAGER or \"w\" for DOCKER WORKER"
+	exit 1
+fi
+
+read -p "[SERVER] - Informe o IP do servidor: [${DK_SERVER_IP}] " -e answer
+DK_SERVER_IP=${answer:-${DK_SERVER_IP}}
 
 ### STARTUP SCRIPT
-if [ "$type_install" = "M" ]; then
-	echo "[SERVER] - Informe o IP do servidor:"
-	read server_ip
-	echo "[SERVER] - Instalar NFS SERVER neste servidor? [Y|n]"
-	read server_install_nfs
-	echo "[LOGGER] - Informe o host do servidor de log:"
-	read logger_host
-	echo "[REPO] - Informe o host do repositório GitLab:"
-	read repo_host
-	echo "[REPO] - Informe o host do servidor NFS:"
-	read repo_nfs_host
-	if [ "${server_install_nfs}" = "Y" ]; then
-		repo_nfs_path=/mnt/storage-1/grdk-repo
-	else
-		echo "[REPO] - Informe o diretório do servidor NFS:"
-		read repo_nfs_path
-	fi
-	echo "[REPO-DI] - Informe o host do repositório de imagens Docker:"
-	read repo_di_host
-	echo "[MSG] - Informe o token para GitLab WebHooks:"
-	read msg_gitlab_wh_tk
+if [ "$DK_INSTALL_TYPE" = "M" ]; then
 
-	unset DK_INSTALL_PATH
-	unset DK_SERVER_NODE_ROLE
-	unset DK_SERVER_IP
-	unset DK_SERVER_INST_NFS
-	unset DK_LOGGER_HOST
-	unset DK_REPO_HOST
-	unset DK_REPO_NFS_HOST
-	unset DK_REPO_NFS_PATH
-	unset DK_REPO_DI_HOST
-	unset DK_MSG_GITLAB_WH_TK
-
-	cat > /etc/environment << EOF
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-DK_INSTALL_PATH="${curr_dir}"
-DK_SERVER_NODE_ROLE="manager"
-DK_SERVER_IP="${server_ip}"
-DK_SERVER_INST_NFS="${server_install_nfs}"
-DK_LOGGER_HOST="${logger_host}"
-DK_REPO_HOST="${repo_host}"
-DK_REPO_NFS_HOST="${repo_nfs_host}"
-DK_REPO_NFS_PATH="${repo_nfs_path}"
-DK_REPO_DI_HOST="${repo_di_host}"
-DK_MSG_GITLAB_WH_TK="${msg_gitlab_wh_tk}"
-EOF
-	#for line in $( cat /etc/environment ) ; do export $line ; done
-	#for line in $( cat /etc/environment ) ; do set $line ; done
+	read -p "[SERVER] - Instalar NFS SERVER neste servidor? (Y/n) [${DK_SERVER_INST_NFS}] " -e answer
+	DK_SERVER_INST_NFS=${answer:-${DK_SERVER_INST_NFS}}
+	read -p "[LOGGER] - Informe o host do servidor de log: [${DK_LOGGER_HOST}] " -e answer
+	DK_LOGGER_HOST=${answer:-${DK_LOGGER_HOST}}
+	read -p "[REPO] - Informe o host do repositório GitLab: [${DK_REPO_HOST}] " -e answer
+	DK_REPO_HOST=${answer:-${DK_REPO_HOST}}
+	read -p "[REPO] - Informe o host do servidor NFS: [${DK_REPO_NFS_HOST}] " -e answer
+	DK_REPO_NFS_HOST=${answer:-${DK_REPO_NFS_HOST}}
+	read -p "[REPO] - Informe o diretório do servidor NFS: [${DK_REPO_NFS_PATH}] " -e answer
+	DK_REPO_NFS_PATH=${answer:-${DK_REPO_NFS_PATH}}
+	read -p "[REPO-DI] - Informe o host do repositório de imagens Docker: [${DK_REPO_DI_HOST}] " -e answer
+	DK_REPO_DI_HOST=${answer:-${DK_REPO_DI_HOST}}
+	read -p "[MSG] - Informe o host do servidor de mensagens: [${DK_MSG_HOST}] " -e answer
+	DK_MSG_HOST=${answer:-${DK_MSG_HOST}}
+	read -p "[MSG] - Informe o token para GitLab WebHooks: [${DK_MSG_GITLAB_WH_TK}] " -e answer
+	DK_MSG_GITLAB_WH_TK=${answer:-${DK_MSG_GITLAB_WH_TK}}
 
 	cat > ./environment.sh << EOF
 #!/bin/bash
-export DK_INSTALL_PATH="${curr_dir}"
-export DK_SERVER_NODE_ROLE="manager"
-export DK_SERVER_IP="${server_ip}"
-export DK_SERVER_INST_NFS="${server_install_nfs}"
-export DK_LOGGER_HOST="${logger_host}"
-export DK_REPO_HOST="${repo_host}"
-export DK_REPO_NFS_HOST="${repo_nfs_host}"
-export DK_REPO_NFS_PATH="${repo_nfs_path}"
-export DK_REPO_DI_HOST="${repo_di_host}"
-export DK_MSG_GITLAB_WH_TK="${msg_gitlab_wh_tk}"
+export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
+export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
+export DK_SERVER_IP="${DK_SERVER_IP}"
+export DK_SERVER_INST_NFS="${DK_SERVER_INST_NFS}"
+export DK_LOGGER_HOST="${DK_LOGGER_HOST}"
+export DK_REPO_HOST="${DK_REPO_HOST}"
+export DK_REPO_NFS_HOST="${DK_REPO_NFS_HOST}"
+export DK_REPO_NFS_PATH="${DK_REPO_NFS_PATH}"
+export DK_REPO_DI_HOST="${DK_REPO_DI_HOST}"
+export DK_MSG_HOST="${DK_MSG_HOST}"
+export DK_MSG_GITLAB_WH_TK="${DK_MSG_GITLAB_WH_TK}"
 EOF
 	source ./environment.sh
 
-	echo 'DK_INSTALL_PATH: '$DK_INSTALL_PATH
-	echo 'DK_SERVER_NODE_ROLE: '$DK_SERVER_NODE_ROLE
-	echo 'DK_SERVER_IP: '$DK_SERVER_IP
-	echo 'DK_SERVER_INST_NFS: '$DK_SERVER_INST_NFS
-	echo 'DK_LOGGER_HOST: '$DK_LOGGER_HOST
-	echo 'DK_REPO_HOST: '$DK_REPO_HOST
-	echo 'DK_REPO_NFS_HOST: '$DK_REPO_NFS_HOST
-	echo 'DK_REPO_NFS_PATH: '$DK_REPO_NFS_PATH
-	echo 'DK_REPO_DI_HOST: '$DK_REPO_DI_HOST
-	echo 'DK_MSG_GITLAB_WH_TK: '$DK_MSG_GITLAB_WH_TK
-	read -p "Continuar? [Y|n] " answer
-	if [ $answer != "Y" ]; then
+	if [ -f "./environment.sh" ]; then
+		sed '/^DK_/ d' < /etc/environment > /etc/_environment
+		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> /etc/_environment
+		mv /etc/_environment /etc/environment
+	fi
+
+	echo ""
+	echo "###"
+	echo "### Variáveis definidas:"
+	echo "###"
+	echo ""
+	sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}'
+	echo ""
+
+	read -p "Continuar? (Y|n) [n] " answer
+	answer=${answer:-n}
+	if [ "$answer" != "Y" ]; then
 		exit 1
 	fi
+
 	source ./vendor/grdk-core/grdk-install-manager.sh
-elif [ "$type_install" = "w" ]; then
-	echo "[SERVER] - Informe o IP do servidor:"
-	read server_ip
-	echo "[REPO] - Informe o host do repositório GitLab:"
-	read repo_host
-	echo "[REPO-DI] - Informe o host do repositório de imagens Docker:"
-	read repo_di_host
-	echo "[SWARM] - Informe o IP do servidor MANAGER:"
-	read swarm_ip
-	echo "[SWARM] - Informe o token:"
-	read swarm_token
 
-	unset DK_INSTALL_PATH
-	unset DK_SERVER_NODE_ROLE
-	unset DK_SERVER_IP
-	unset DK_REPO_HOST
-	unset DK_REPO_DI_HOST
-	unset DK_SWARM_IP
-	unset DK_SWARM_TOKEN
+elif [ "$DK_INSTALL_TYPE" = "w" ]; then
 
-	cat > /etc/environment << EOF
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-DK_INSTALL_PATH="${curr_dir}"
-DK_SERVER_NODE_ROLE="worker"
-DK_SERVER_IP="${server_ip}"
-DK_REPO_HOST="${repo_host}"
-DK_REPO_DI_HOST="${repo_di_host}"
-DK_SWARM_IP="${swarm_ip}"
-DK_SWARM_TOKEN="${swarm_token}"
-EOF
-	#for line in $( cat /etc/environment ) ; do export $line ; done
-	#for line in $( cat /etc/environment ) ; do set $line ; done
+	read -p "[REPO] - Informe o host do repositório GitLab: [${DK_REPO_HOST}] " -e answer
+	DK_REPO_HOST=${answer:-${DK_REPO_HOST}}
+	read -p "[REPO-DI] - Informe o host do repositório de imagens Docker: [${DK_REPO_DI_HOST}] " -e answer
+	DK_REPO_DI_HOST=${answer:-${DK_REPO_DI_HOST}}
+	read -p "[SWARM] - Informe o IP do servidor MANAGER: [${DK_SWARM_IP}] " -e answer
+	DK_SWARM_IP=${answer:-${DK_SWARM_IP}}
+	read -p "[SWARM] - Informe o token: [${DK_SWARM_TOKEN}] " -e answer
+	DK_SWARM_TOKEN=${answer:-${DK_SWARM_TOKEN}}
 
 	cat > ./environment.sh << EOF
 #!/bin/bash
-export DK_INSTALL_PATH="${curr_dir}"
-export DK_SERVER_NODE_ROLE="worker"
-export DK_SERVER_IP="${server_ip}"
-export DK_REPO_HOST="${repo_host}"
-export DK_REPO_DI_HOST="${repo_di_host}"
-export DK_SWARM_IP="${swarm_ip}"
-export DK_SWARM_TOKEN="${swarm_token}"
+export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
+export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
+export DK_SERVER_IP="${DK_SERVER_IP}"
+export DK_REPO_HOST="${DK_REPO_HOST}"
+export DK_REPO_DI_HOST="${DK_REPO_DI_HOST}"
+export DK_SWARM_IP="${DK_SWARM_IP}"
+export DK_SWARM_TOKEN="${DK_SWARM_TOKEN}"
 EOF
 	source ./environment.sh
 
-	echo 'DK_INSTALL_PATH: '$DK_INSTALL_PATH
-	echo 'DK_SERVER_NODE_ROLE: '$DK_SERVER_NODE_ROLE
-	echo 'DK_SERVER_IP: '$DK_SERVER_IP
-	echo 'DK_REPO_HOST: '$DK_REPO_HOST
-	echo 'DK_REPO_DI_HOST: '$DK_REPO_DI_HOST
-	echo 'DK_SWARM_IP: '$DK_SWARM_IP
-	echo 'DK_SWARM_TOKEN: '$DK_SWARM_TOKEN
-	read -p "Continuar? [Y|n] " answer
-	if [ $answer != "Y" ]; then
+	if [ -f "./environment.sh" ]; then
+		sed '/^DK_/ d' < /etc/environment > /etc/_environment
+		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> /etc/_environment
+		mv /etc/_environment /etc/environment
+	fi
+
+	echo ""
+	echo "###"
+	echo "### Variáveis definidas:"
+	echo "###"
+	echo ""
+	sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}'
+	echo ""
+
+	read -p "Continuar? (Y|n) [n] " answer
+	answer=${answer:-n}
+	if [ "$answer" != "Y" ]; then
 		exit 1
 	fi
+
 	source ./vendor/grdk-core/grdk-install-worker.sh
+
 else
 	echo "Nothing selected"
 fi
