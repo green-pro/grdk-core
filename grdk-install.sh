@@ -77,29 +77,6 @@ export DK_REPO_DI_HOST="${DK_REPO_DI_HOST}"
 export DK_MSG_HOST="${DK_MSG_HOST}"
 export DK_MSG_GITLAB_WH_TK="${DK_MSG_GITLAB_WH_TK}"
 EOF
-	source ./environment.sh
-
-	if [ -f "./environment.sh" ]; then
-		sed '/^DK_/ d' < /etc/environment > $DK_BUILD_PATH/environment
-		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> $DK_BUILD_PATH/environment
-		cp $DK_BUILD_PATH/environment /etc/environment
-	fi
-
-	echo ""
-	echo "###"
-	echo "### Variáveis definidas:"
-	echo "###"
-	echo ""
-	sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}'
-	echo ""
-
-	read -p "Continuar? (Y|n) [n] " answer
-	answer=${answer:-n}
-	if [ "$answer" != "Y" ]; then
-		exit 1
-	fi
-
-	source ./vendor/grdk-core/grdk-install-manager.sh
 
 elif [ "$DK_INSTALL_TYPE" = "w" ]; then
 
@@ -123,30 +100,37 @@ export DK_REPO_DI_HOST="${DK_REPO_DI_HOST}"
 export DK_SWARM_IP="${DK_SWARM_IP}"
 export DK_SWARM_TOKEN="${DK_SWARM_TOKEN}"
 EOF
-	source ./environment.sh
 
-	if [ -f "./environment.sh" ]; then
-		sed '/^DK_/ d' < /etc/environment > $DK_BUILD_PATH/environment
-		sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> $DK_BUILD_PATH/environment
-		cp $DK_BUILD_PATH/environment /etc/environment
-	fi
+fi
 
-	echo ""
-	echo "###"
-	echo "### Variáveis definidas:"
-	echo "###"
-	echo ""
-	sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}'
-	echo ""
+if [ ! -f "./environment.sh" ]; then
+	echo "ERROR - File \"environment.sh\" not found"
+	exit 1
+fi
 
-	read -p "Continuar? (Y|n) [n] " answer
-	answer=${answer:-n}
-	if [ "$answer" != "Y" ]; then
-		exit 1
-	fi
+source ./environment.sh
 
+sed '/^DK_/ d' < /etc/environment > $DK_BUILD_PATH/environment
+sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}' >> $DK_BUILD_PATH/environment
+cp $DK_BUILD_PATH/environment /etc/environment
+
+echo ""
+echo "###"
+echo "### Variáveis definidas:"
+echo "###"
+echo ""
+sed -n -e '/^export/ p' < ./environment.sh | awk '{print $2}'
+echo ""
+
+read -p "Continuar? (Y|n) [n] " answer
+answer=${answer:-n}
+if [ "$answer" != "Y" ]; then
+	echo "Saindo..."
+	exit 1
+fi
+
+if [ "$DK_INSTALL_TYPE" = "M" ]; then
+	source ./vendor/grdk-core/grdk-install-manager.sh
+elif [ "$DK_INSTALL_TYPE" = "w" ]; then
 	source ./vendor/grdk-core/grdk-install-worker.sh
-
-else
-	echo "Nothing selected"
 fi
