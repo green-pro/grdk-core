@@ -6,6 +6,9 @@ curr_dir="$(pwd)"
 if [ ! -d "./build" ]; then
 	mkdir -p ./build
 fi
+if [ ! -d "./tmp" ]; then
+	mkdir -p ./tmp
+fi
 
 # DEFAULT ENV VARS
 DK_INSTALL_TYPE="empty"
