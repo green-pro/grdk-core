@@ -3,9 +3,9 @@ set -e
 
 ### INSTALL PKG APT-GET
 if [ "${DK_SERVER_INST_NFS}" = "Y" ]; then
-	apt-get update && apt-get install -y nfs-kernel-server nfs-common unzip
+	apt-get update && apt-get install -y nfs-kernel-server nfs-common unzip libjson-xs-perl jq
 else
-	apt-get update && apt-get install -y nfs-common unzip
+	apt-get update && apt-get install -y nfs-common unzip libjson-xs-perl jq
 fi
 
 ### CALLBACK PRE INSTALL

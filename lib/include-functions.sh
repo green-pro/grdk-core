@@ -49,3 +49,51 @@ grdk_containers_checkup()
 	done
 	return 0
 }
+
+grdk_replace_vars()
+{
+	sed -e "s#{{ DK_SERVER_NODE_ROLE }}#${DK_SERVER_NODE_ROLE}#g" \
+		-e "s#{{ DK_SERVER_IP }}#${DK_SERVER_IP}#g" \
+		-e "s#{{ DK_SERVER_INST_NFS }}#${DK_SERVER_INST_NFS}#g" \
+		-e "s#{{ DK_LOGGER_HOST }}#${DK_LOGGER_HOST}#g" \
+		-e "s#{{ DK_REPO_HOST }}#${DK_REPO_HOST}#g" \
+		-e "s#{{ DK_REPO_NFS_HOST }}#${DK_REPO_NFS_HOST}#g" \
+		-e "s#{{ DK_REPO_NFS_PATH }}#${DK_REPO_NFS_PATH}#g" \
+		-e "s#{{ DK_REPO_DI_HOST }}#${DK_REPO_DI_HOST}#g" \
+		< $1 > $2
+}
+
+grdk_yaml2json()
+{
+	perl -MYAML::XS=LoadFile -MJSON::XS=encode_json -e 'for (@ARGV) { for (LoadFile($_)) { print encode_json($_),"\n" } }' \
+		$1 > \
+		$2
+}
+
+grdk_check_volumes()
+{
+	tmp_file="_grdk_check_volumes_js_${RANDOM}"
+	grdk_yaml2json $1 $DK_INSTALL_PATH/tmp/$tmp_file
+	echo "Searching in file: ${1}"
+	nfs_volumes=$(cat $DK_INSTALL_PATH/tmp/$tmp_file | jq -r 'select(has("volumes")) |.volumes | to_entries | .[].value | select(.driver == "nfs") | select(has("driver_opts")) | .driver_opts | select(has("share")) | .share')
+	for nfs_path in $nfs_volumes
+	do
+		echo "Volume: ${nfs_path}"
+		read -p "Testar volume NFS? (Y|n) [n] " answer
+		answer=${answer:-n}
+		if [ "$answer" = "Y" ]; then
+			echo "Resultado:"
+			mkdir -p /var/tmp/test-nfs
+			mount -t nfs4 $nfs_path /var/tmp/test-nfs
+			nfs_ok=$(cat /proc/mounts | grep 'nfs4' | grep "${nfs_path} " -c)
+			if [[ "$nfs_ok" -gt 0 ]]; then
+				echo "NFS OK"
+			else
+				echo "NFS FAIL"
+				exit 1
+			fi
+			umount /var/tmp/test-nfs
+			sleep 1
+		fi
+	done
+}
