@@ -53,37 +53,44 @@ do
 done
 
 ### CHECK NFS VOLUMES
-echo "CHECK NFS VOLUMES"
-for entry in "./build/services"/*
-do
-	if [ -d "$entry" ]; then
-		if [ -f "${entry}/_docker-stack.yml" ]; then
-			grdk_check_volumes $entry/_docker-stack.yml
+read -p "Testar volumes NFS? (Y|n) [n] " answer
+answer=${answer:-n}
+if [ "$answer" = "Y" ]; then
+	echo "CHECK NFS VOLUMES"
+	for entry in "./build/services"/*
+	do
+		if [ -d "$entry" ]; then
+			if [ -f "${entry}/_docker-stack.yml" ]; then
+				grdk_check_volumes $entry/_docker-stack.yml
+			fi
+			if [ -f "${entry}/_docker-compose.yml" ]; then
+				grdk_check_volumes $entry/_docker-compose.yml
+			fi
 		fi
-		if [ -f "${entry}/_docker-compose.yml" ]; then
-			grdk_check_volumes $entry/_docker-compose.yml
-		fi
-	fi
-done
+	done
+fi
 
 source ./vendor/grdk-core/grdk-preload-images.sh
 
-read -p "Confirma START UP dos serviços L1 ? [Y|n] " answer
-if [ $answer != "Y" ]; then
+read -p "Confirma START-UP dos serviços L1? (Y|n) [n] " answer
+answer=${answer:-n}
+if [ "$answer" != "Y" ]; then
 	exit 1
 fi
 
 source ./vendor/grdk-core/grdk-start-step1.sh
 
-read -p "Continuar L2 ? [Y|n] " answer
-if [ $answer != "Y" ]; then
+read -p "Continuar L2? (Y|n) [n] " answer
+answer=${answer:-n}
+if [ "$answer" != "Y" ]; then
 	exit 1
 fi
 
 source ./vendor/grdk-core/grdk-start-step2.sh
 
-read -p "Continuar L3 ? [Y|n] " answer
-if [ $answer != "Y" ]; then
+read -p "Continuar L3? (Y|n) [n] " answer
+answer=${answer:-n}
+if [ "$answer" != "Y" ]; then
 	exit 1
 fi
 

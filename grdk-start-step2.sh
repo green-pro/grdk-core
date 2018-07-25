@@ -4,7 +4,7 @@ echo "STEP2 - START"
 
 ### CHECK REQUIREMENTS
 set +e
-grdk_containers_checkup grdk-repo_ 100 3
+grdk_containers_checkup grdk-repo_ 600 3
 if [ $? = 1 ]; then
 	echo "GRDK-REPO - OK"
 else
