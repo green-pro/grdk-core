@@ -5,7 +5,7 @@ set -e
 apt-get update && apt-get install -y nfs-common unzip libconfig-yaml-perl libjson-xs-perl jq
 
 ### DOCKER-CE
-curl -sSL https://get.docker.com | sh
+curl -sSL https://get.docker.com | CHANNEL=stable sh
 echo "{\"dns\":[\"${DK_SERVER_DNS}\"],\"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"]}" > /etc/docker/daemon.json
 
 ### DOCKER-COMPOSE
