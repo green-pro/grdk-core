@@ -3,9 +3,9 @@ set -e
 
 ### INSTALL PKG APT-GET
 if [ "${DK_SERVER_INST_NFS}" = "Y" ]; then
-	apt-get update && apt-get install -y nfs-kernel-server nfs-common unzip libjson-xs-perl jq
+	apt-get update && apt-get install -y nfs-kernel-server nfs-common unzip libconfig-yaml-perl libjson-xs-perl jq
 else
-	apt-get update && apt-get install -y nfs-common unzip libjson-xs-perl jq
+	apt-get update && apt-get install -y nfs-common unzip libconfig-yaml-perl libjson-xs-perl jq
 fi
 
 ### CALLBACK PRE INSTALL
@@ -51,7 +51,7 @@ fi
 
 ### DOCKER-CE
 curl -sSL https://get.docker.com | sh
-echo "{ \"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"] }" > /etc/docker/daemon.json
+echo "{\"dns\":[\"${DK_SERVER_DNS}\"],\"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"]}" > /etc/docker/daemon.json
 
 ### DOCKER-COMPOSE
 curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose

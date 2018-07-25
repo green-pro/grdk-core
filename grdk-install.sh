@@ -16,6 +16,7 @@ DK_INSTALL_PATH="${curr_dir}"
 DK_BUILD_PATH="${curr_dir}/build"
 DK_SERVER_NODE_ROLE="empty"
 DK_SERVER_IP="192.168.0.1"
+DK_SERVER_DNS="192.168.0.1"
 DK_SERVER_INST_NFS="Y"
 DK_LOGGER_HOST="logger.domain"
 DK_REPO_HOST="repo.domain"
@@ -44,6 +45,8 @@ fi
 
 read -p "[SERVER] - Informe o IP do servidor: [${DK_SERVER_IP}] " -e answer
 DK_SERVER_IP=${answer:-${DK_SERVER_IP}}
+read -p "[SERVER] - Informe o IP do servidor DNS: [${DK_SERVER_DNS}] " -e answer
+DK_SERVER_DNS=${answer:-${DK_SERVER_DNS}}
 
 ### STARTUP SCRIPT
 if [ "$DK_INSTALL_TYPE" = "M" ]; then
@@ -71,6 +74,7 @@ export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
 export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
 export DK_SERVER_IP="${DK_SERVER_IP}"
+export DK_SERVER_DNS="${DK_SERVER_DNS}"
 export DK_SERVER_INST_NFS="${DK_SERVER_INST_NFS}"
 export DK_LOGGER_HOST="${DK_LOGGER_HOST}"
 export DK_REPO_HOST="${DK_REPO_HOST}"
@@ -98,6 +102,7 @@ export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
 export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
 export DK_SERVER_IP="${DK_SERVER_IP}"
+export DK_SERVER_DNS="${DK_SERVER_DNS}"
 export DK_REPO_HOST="${DK_REPO_HOST}"
 export DK_REPO_DI_HOST="${DK_REPO_DI_HOST}"
 export DK_SWARM_IP="${DK_SWARM_IP}"

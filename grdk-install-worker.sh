@@ -2,11 +2,11 @@
 set -e
 
 ### INSTALL PKG APT-GET
-apt-get update && apt-get install -y nfs-common
+apt-get update && apt-get install -y nfs-common unzip libconfig-yaml-perl libjson-xs-perl jq
 
 ### DOCKER-CE
 curl -sSL https://get.docker.com | sh
-echo "{ \"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"] }" > /etc/docker/daemon.json
+echo "{\"dns\":[\"${DK_SERVER_DNS}\"],\"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"]}" > /etc/docker/daemon.json
 
 ### DOCKER-COMPOSE
 curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
