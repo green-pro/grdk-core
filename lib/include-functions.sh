@@ -97,3 +97,20 @@ grdk_check_volumes()
 		fi
 	done
 }
+
+grdk_qbuild_img() {
+	# PARAMS
+	PAR_IMG_NAME=$1
+	# BODY
+	buildimg=0
+	if curl --location --silent --fail "http://${DK_REPO_DI_HOST}:5000/v2/${PAR_IMG_NAME}/tags/list" > /dev/null; then
+		read -p "A imagem \"${PAR_IMG_NAME}\" já existe, deseja recontruí-la? (Y|n) [n] " answer
+		answer=${answer:-n}
+		if [ "$answer" = "Y" ]; then
+			buildimg=1
+		fi
+	else
+		buildimg=1
+	fi
+	return $buildimg
+}

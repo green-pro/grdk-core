@@ -14,16 +14,19 @@ fi
 set -e
 
 ### GRDK-MSG-BUILD
-if curl --location --silent --fail "http://${DK_REPO_DI_HOST}:5000/v2/grdk-msg/tags/list" > /dev/null
-then
-	echo "GRDK-MSG - BUILD skiped"
-else
+set +e
+grdk_qbuild_img grdk-msg
+ret_b=$?
+set -e
+if [ $ret_b = 1 ]; then
 	echo "GRDK-MSG - RUN BUILD"
 	cp ./src/services/msg/config.php ./vendor/grdk-core/services/msg/
 	cp -R ./src/services/msg/gitlab-webhooks ./vendor/grdk-core/services/msg/
 	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-msg:latest -f ./vendor/grdk-core/services/msg/Dockerfile ./vendor/grdk-core/services/msg/
 	echo "GRDK-MSG - PUSH -> REPO-DI"
 	docker push ${DK_REPO_DI_HOST}:5000/grdk-msg:latest
+else
+	echo "GRDK-MSG - BUILD skiped"
 fi
 
 ### GRDK-MSG-DEPLOY
@@ -57,10 +60,11 @@ else
 fi
 
 ### GRDK-REPO-DIND (GITLAB)
-if curl --location --silent --fail "http://${DK_REPO_DI_HOST}:5000/v2/grdk-repo-dind/tags/list" > /dev/null
-then
-	echo "GRDK-REPO-DIND - BUILD skiped"
-else
+set +e
+grdk_qbuild_img grdk-repo-dind
+ret_b=$?
+set -e
+if [ $ret_b = 1 ]; then
 	echo "GRDK-REPO-DIND - RUN BUILD"
 	sed -e "s#{{ DK_SERVER_NODE_ROLE }}#${DK_SERVER_NODE_ROLE}#g" \
 		-e "s#{{ DK_SERVER_IP }}#${DK_SERVER_IP}#g" \
@@ -75,6 +79,8 @@ else
 	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-repo-dind:latest -f ./vendor/grdk-core/services/repo/dind/_Dockerfile ./vendor/grdk-core/services/repo/dind/
 	echo "GRDK-REPO-DIND - PUSH -> REPO-DI"
 	docker push ${DK_REPO_DI_HOST}:5000/grdk-repo-dind:latest
+else
+	echo "GRDK-REPO-DIND - BUILD skiped"
 fi
 
 ### GRDK-LOGGER (GRAYLOG)
@@ -92,10 +98,11 @@ echo "Aguardando..."
 sleep 5s
 
 ### GRDK-PROXY-BUILD (NGINX)
-if curl --location --silent --fail "http://${DK_REPO_DI_HOST}:5000/v2/grdk-proxy/tags/list" > /dev/null
-then
-	echo "GRDK-PROXY - BUILD skiped"
-else
+set +e
+grdk_qbuild_img grdk-proxy
+ret_b=$?
+set -e
+if [ $ret_b = 1 ]; then
 	echo "GRDK-PROXY - RUN BUILD"
 	cp ./src/services/proxy/hosts.conf ./vendor/grdk-core/services/proxy/
 	cp ./src/services/proxy/e_* ./vendor/grdk-core/services/proxy/
@@ -119,6 +126,8 @@ EOF
 	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-proxy:latest ./vendor/grdk-core/services/proxy/
 	echo "GRDK-PROXY - PUSH -> REPO-DI"
 	docker push ${DK_REPO_DI_HOST}:5000/grdk-proxy:latest
+else
+	echo "GRDK-PROXY - BUILD skiped"
 fi
 
 ### GRDK-PROXY-DEPLOY (NGINX) - NAO DEU CERTO, PRECISA USAR A REDE LOCAL - PROBLEMA DOS IPS COM SWARM
