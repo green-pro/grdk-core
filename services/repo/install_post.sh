@@ -18,8 +18,8 @@ if [ -f "$file_ssh_config" ]; then
 #
 # GRDKDEPLOYKEY
 #
-Host ${repo_host}
-  Hostname ${repo_host}
+Host ${DK_REPO_HOST}
+  Hostname ${DK_REPO_HOST}
   User git
   Port 2200
   PreferredAuthentications publickey
@@ -32,3 +32,5 @@ echo "Add GitLab Deploy Keys"
 echo "--------------------------------------------------------------------------------"
 cat /etc/ssh/ssh_host_rsa_key.pub
 echo "--------------------------------------------------------------------------------"
+
+read -p "Tecle ENTER para continuar " answer
