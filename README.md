@@ -9,6 +9,7 @@ GRDKCore - Biblioteca principal dos serviços Docker
 * GRDKRepoDI (5000)
 * GRDKMonitor (8001)
 * GRDKMsg (8002)
+* GRDKBackup
 
 ## Pré-requisitos
 

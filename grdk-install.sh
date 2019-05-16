@@ -25,6 +25,9 @@ DK_REPO_NFS_PATH="/mnt/storage-1/grdk-repo"
 DK_REPO_DI_HOST="repo-di.domain"
 DK_MSG_HOST="msg.domain"
 DK_MSG_GITLAB_WH_TK="secret"
+DK_AWS_ACCESS_KEY_ID=""
+DK_AWS_SECRET_ACCESS_KEY=""
+DK_AWS_BUCKET=""
 DK_SWARM_IP="192.168.0.1"
 DK_SWARM_TOKEN="secret"
 
@@ -67,6 +70,12 @@ if [ "$DK_INSTALL_TYPE" = "M" ]; then
 	DK_MSG_HOST=${answer:-${DK_MSG_HOST}}
 	read -p "[MSG] - Informe o token para GitLab WebHooks: [${DK_MSG_GITLAB_WH_TK}] " -e answer
 	DK_MSG_GITLAB_WH_TK=${answer:-${DK_MSG_GITLAB_WH_TK}}
+	read -p "[AWS] - Informe o AWS_ACCESS_KEY_ID: [${DK_AWS_ACCESS_KEY_ID}] " -e answer
+	DK_AWS_ACCESS_KEY_ID=${answer:-${DK_AWS_ACCESS_KEY_ID}}
+	read -p "[AWS] - Informe o AWS_SECRET_ACCESS_KEY: [${DK_AWS_SECRET_ACCESS_KEY}] " -e answer
+	DK_AWS_SECRET_ACCESS_KEY=${answer:-${DK_AWS_SECRET_ACCESS_KEY}}
+	read -p "[AWS] - Informe o AWS_BUCKET: [${DK_AWS_BUCKET}] " -e answer
+	DK_AWS_BUCKET=${answer:-${DK_AWS_BUCKET}}
 
 	cat > ./environment.sh << EOF
 #!/bin/bash
@@ -83,6 +92,9 @@ export DK_REPO_NFS_PATH="${DK_REPO_NFS_PATH}"
 export DK_REPO_DI_HOST="${DK_REPO_DI_HOST}"
 export DK_MSG_HOST="${DK_MSG_HOST}"
 export DK_MSG_GITLAB_WH_TK="${DK_MSG_GITLAB_WH_TK}"
+export DK_AWS_ACCESS_KEY_ID="${DK_AWS_ACCESS_KEY_ID}"
+export DK_AWS_SECRET_ACCESS_KEY="${DK_AWS_SECRET_ACCESS_KEY}"
+export DK_AWS_BUCKET="${DK_AWS_BUCKET}"
 EOF
 
 elif [ "$DK_INSTALL_TYPE" = "w" ]; then
