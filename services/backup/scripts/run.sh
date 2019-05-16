@@ -45,7 +45,7 @@ BACKUP_FOLDER=${BACKUP_DIR}/${DB_NAME}_$(date +%Y%m%d%H%M%S)
 
 FILENAME=${DB_NAME}_$(date +%Y%m%d%H%M%S).tar.gz
 
-mydumper -c -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p "${DB_PASS}" -B "${DB_NAME}" -o "${BACKUP_FOLDER}"
+mydumper -c -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p "${DB_PASS}" -B "${DB_NAME}" -o "${BACKUP_FOLDER}" --less-locking
 
 if [ $? -eq 0 ]; then
 	echo "BACKUP OK"
