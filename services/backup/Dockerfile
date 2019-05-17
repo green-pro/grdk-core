@@ -1,16 +1,22 @@
-FROM alpine:edge
+FROM alpine:3.9
+
+ARG MYDUMPER_VERSION=0.9.5
 
 ENV PACKAGES="mysql-client" \
-    LIB_PACKAGES="glib-dev mariadb-dev zlib-dev pcre-dev libressl-dev python2 bash curl rsync" \
-    BUILD_PACKAGES="cmake build-base git py2-pip" \
-    BUILD_PATH="/opt/mydumper-src/"
+    LIB_PACKAGES="glib-dev mysql-dev zlib-dev pcre-dev libressl-dev ca-certificates openssl python2 bash curl rsync" \
+    BUILD_PACKAGES="cmake build-base py2-pip" \
+    BUILD_PATH="/tmp/mydumper-src/"
 
 RUN apk --no-cache add \
           $PACKAGES \
           $BUILD_PACKAGES \
           $LIB_PACKAGES && \
-    git clone https://github.com/maxbube/mydumper.git $BUILD_PATH && \
+    mkdir -p $BUILD_PATH && \
     cd $BUILD_PATH && \
+    wget "https://github.com/maxbube/mydumper/archive/v$MYDUMPER_VERSION.tar.gz" -O mydumper.tar.gz && \
+    tar -xzf mydumper.tar.gz && \
+    rm mydumper.tar.gz && \
+    cd mydumper* && \
     cmake . && \
     make && \
     mv ./mydumper /usr/bin/. && \
@@ -19,7 +25,7 @@ RUN apk --no-cache add \
     cd / && rm -rf $BUILD_PATH && \
     apk del $BUILD_PACKAGES && \
     rm -f /usr/lib/*.a && \
-    (rm "/tmp/"* 2>/dev/null || true) && \
+    (rm -rf "/tmp/"* 2>/dev/null || true) && \
     (rm -rf /var/cache/apk/* 2>/dev/null || true)
 
 COPY ./scripts /scripts
