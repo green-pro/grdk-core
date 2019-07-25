@@ -2,6 +2,13 @@
 
 source ./environment.sh
 
+if [ "${DK_SERVER_NODE_ROLE}" = "manager" ]; then
+	echo "NODE MANAGER - OK"
+else
+	echo "NODE MANAGER - FAIL - Run only manager node"
+	exit 1
+fi
+
 read -p "Confirma STOP dos serviços L3? (Y|n) [n] " answer
 answer=${answer:-n}
 if [ "$answer" != "Y" ]; then

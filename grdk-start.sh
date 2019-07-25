@@ -3,6 +3,13 @@
 source ./environment.sh
 source ./vendor/grdk-core/lib/include-functions.sh
 
+if [ "${DK_SERVER_NODE_ROLE}" = "manager" ]; then
+	echo "NODE MANAGER - OK"
+else
+	echo "NODE MANAGER - FAIL - Run only manager node"
+	exit 1
+fi
+
 if [ ! -d "${DK_INSTALL_PATH}/build" ]; then
 	mkdir -p $DK_INSTALL_PATH/build
 fi
