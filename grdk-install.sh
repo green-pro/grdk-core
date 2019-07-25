@@ -46,7 +46,7 @@ else
 	exit 1
 fi
 
-read -p "[SERVER] - Informe o IP do servidor: [${DK_SERVER_IP}] " -e answer
+read -p "[SERVER] - Informe o IP deste servidor: [${DK_SERVER_IP}] " -e answer
 DK_SERVER_IP=${answer:-${DK_SERVER_IP}}
 read -p "[SERVER] - Informe o IP do servidor DNS: [${DK_SERVER_DNS}] " -e answer
 DK_SERVER_DNS=${answer:-${DK_SERVER_DNS}}
