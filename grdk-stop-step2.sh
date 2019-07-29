@@ -2,6 +2,15 @@
 
 echo "STEP2 - START"
 
+### GRDK-BACKUP
+SERVICES=$(docker service ls -q -f name=grdk-backup_cron | wc -l)
+if [[ "$SERVICES" -gt 0 ]]; then
+	echo "GRDK-BACKUP - STACK REMOVED"
+	docker stack rm grdk-backup
+else
+	echo "GRDK-BACKUP - STACK REMOVE skiped"
+fi
+
 ### GRDK-PROXY (NGINX)
 if [ "$(docker ps -q -f name=grdk-proxy)" ]; then
 	if [ "$(docker ps -aq -f status=exited -f name=grdk-proxy)" ]; then
