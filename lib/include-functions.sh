@@ -1,5 +1,10 @@
 #!/bin/bash
 
+command_exists()
+{
+	command -v "$@" > /dev/null 2>&1
+}
+
 grdk_containers_checkup()
 {
 	# PARAMS
