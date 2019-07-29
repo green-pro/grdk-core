@@ -1,4 +1,7 @@
 #!/bin/bash
+
+source ./vendor/grdk-core/lib/include-functions.sh
+
 set -e
 
 curr_dir="$(pwd)"
@@ -19,6 +22,7 @@ DK_SERVER_IP="192.168.0.1"
 DK_SERVER_DNS="192.168.0.1"
 DK_SERVER_INST_NFS="Y"
 DK_LOGGER_HOST="logger.domain"
+DK_REPO_INST_GL="Y"
 DK_REPO_HOST="repo.domain"
 DK_REPO_NFS_HOST="storage-1.domain"
 DK_REPO_NFS_PATH="/mnt/storage-1/grdk-repo"
@@ -58,8 +62,12 @@ if [ "$DK_INSTALL_TYPE" = "M" ]; then
 	DK_SERVER_INST_NFS=${answer:-${DK_SERVER_INST_NFS}}
 	read -p "[LOGGER] - Informe o host do servidor de log: [${DK_LOGGER_HOST}] " -e answer
 	DK_LOGGER_HOST=${answer:-${DK_LOGGER_HOST}}
-	read -p "[REPO] - Informe o host do repositório GitLab: [${DK_REPO_HOST}] " -e answer
-	DK_REPO_HOST=${answer:-${DK_REPO_HOST}}
+	read -p "[REPO] - Utilizar GitLab? (Y/n) [${DK_REPO_INST_GL}] " -e answer
+	DK_REPO_INST_GL=${answer:-${DK_REPO_INST_GL}}
+	if [ "$DK_REPO_INST_GL" = "Y" ]; then
+		read -p "[REPO] - Informe o host do repositório GitLab: [${DK_REPO_HOST}] " -e answer
+		DK_REPO_HOST=${answer:-${DK_REPO_HOST}}
+	fi
 	read -p "[REPO] - Informe o host do servidor NFS: [${DK_REPO_NFS_HOST}] " -e answer
 	DK_REPO_NFS_HOST=${answer:-${DK_REPO_NFS_HOST}}
 	read -p "[REPO] - Informe o diretório do servidor NFS: [${DK_REPO_NFS_PATH}] " -e answer
@@ -86,6 +94,7 @@ export DK_SERVER_IP="${DK_SERVER_IP}"
 export DK_SERVER_DNS="${DK_SERVER_DNS}"
 export DK_SERVER_INST_NFS="${DK_SERVER_INST_NFS}"
 export DK_LOGGER_HOST="${DK_LOGGER_HOST}"
+export DK_REPO_INST_GL="${DK_REPO_INST_GL}"
 export DK_REPO_HOST="${DK_REPO_HOST}"
 export DK_REPO_NFS_HOST="${DK_REPO_NFS_HOST}"
 export DK_REPO_NFS_PATH="${DK_REPO_NFS_PATH}"
@@ -99,8 +108,12 @@ EOF
 
 elif [ "$DK_INSTALL_TYPE" = "w" ]; then
 
-	read -p "[REPO] - Informe o host do repositório GitLab: [${DK_REPO_HOST}] " -e answer
-	DK_REPO_HOST=${answer:-${DK_REPO_HOST}}
+	read -p "[REPO] - Utilizar GitLab? (Y/n) [${DK_REPO_INST_GL}] " -e answer
+	DK_REPO_INST_GL=${answer:-${DK_REPO_INST_GL}}
+	if [ "$DK_REPO_INST_GL" = "Y" ]; then
+		read -p "[REPO] - Informe o host do repositório GitLab: [${DK_REPO_HOST}] " -e answer
+		DK_REPO_HOST=${answer:-${DK_REPO_HOST}}
+	fi
 	read -p "[REPO-DI] - Informe o host do repositório de imagens Docker: [${DK_REPO_DI_HOST}] " -e answer
 	DK_REPO_DI_HOST=${answer:-${DK_REPO_DI_HOST}}
 	read -p "[SWARM] - Informe o IP do servidor MANAGER: [${DK_SWARM_IP}] " -e answer
@@ -115,6 +128,7 @@ export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
 export DK_SERVER_IP="${DK_SERVER_IP}"
 export DK_SERVER_DNS="${DK_SERVER_DNS}"
+export DK_REPO_INST_GL="${DK_REPO_INST_GL}"
 export DK_REPO_HOST="${DK_REPO_HOST}"
 export DK_REPO_DI_HOST="${DK_REPO_DI_HOST}"
 export DK_SWARM_IP="${DK_SWARM_IP}"

@@ -1,0 +1,26 @@
+version: "3.4"
+
+volumes:
+  didata:
+    driver: nfs
+    driver_opts:
+      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/didata"
+
+services:
+  di:
+    image: "registry:2"
+    volumes:
+      - didata:/var/lib/registry
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    ports:
+      - "5000:5000"
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+      restart_policy:
+        condition: on-failure
+        delay: 60s
+        max_attempts: 3
+        window: 60s

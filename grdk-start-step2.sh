@@ -3,8 +3,13 @@
 echo "STEP2 - START"
 
 ### CHECK REQUIREMENTS
+
+CHKRC=1
+if [ "$DK_REPO_INST_GL" = "Y" ]; then
+	CHKRC=3
+fi
 set +e
-grdk_containers_checkup grdk-repo_ 600 3
+grdk_containers_checkup grdk-repo_ 600 $CHKRC
 if [ $? = 1 ]; then
 	echo "GRDK-REPO - OK"
 else
@@ -67,49 +72,53 @@ else
 	docker stack deploy --compose-file  ./vendor/grdk-core/services/msg/docker-stack.yml grdk-msg
 fi
 
-### GRDK-REPO-RUNNER-1 (GITLAB)
-DK_REPO_RUNNER_CID=$(docker container ls -q -f name=grdk-repo_runner-1)
-if [ `docker exec -it $DK_REPO_RUNNER_CID cat /etc/gitlab-runner/config.toml | grep -c 'grdk-repo-runner-1'` != "0" ]; then
-	echo "GRDK-REPO-RUNNER-1 - OK"
-else
-	echo "GRDK-REPO-RUNNER-1 - REGISTER"
-	read -p "Informe o Runner registration token: " DK_REPO_RUNNER_TK
-	docker exec -it $DK_REPO_RUNNER_CID /usr/bin/gitlab-runner register \
-		--non-interactive \
-		--description "grdk-repo-runner-1" \
-		--url "http://${DK_REPO_HOST}:8000/" \
-		--registration-token "${DK_REPO_RUNNER_TK}" \
-		--executor "docker" \
-		--docker-image docker:latest \
-		--docker-privileged \
-		--docker-volumes "/var/run/docker.sock:/var/run/docker.sock" \
-		--tag-list "grdk,grdkrr1" \
-		--run-untagged \
-		--locked="false"
-fi
+if [ "$DK_REPO_INST_GL" = "Y" ]; then
 
-### GRDK-REPO-DIND (GITLAB)
-set +e
-grdk_qbuild_img grdk-repo-dind
-ret_b=$?
-set -e
-if [ $ret_b = 1 ]; then
-	echo "GRDK-REPO-DIND - RUN BUILD"
-	sed -e "s#{{ DK_SERVER_NODE_ROLE }}#${DK_SERVER_NODE_ROLE}#g" \
-		-e "s#{{ DK_SERVER_IP }}#${DK_SERVER_IP}#g" \
-		-e "s#{{ DK_SERVER_INST_NFS }}#${DK_SERVER_INST_NFS}#g" \
-		-e "s#{{ DK_LOGGER_HOST }}#${DK_LOGGER_HOST}#g" \
-		-e "s#{{ DK_REPO_HOST }}#${DK_REPO_HOST}#g" \
-		-e "s#{{ DK_REPO_NFS_HOST }}#${DK_REPO_NFS_HOST}#g" \
-		-e "s#{{ DK_REPO_NFS_PATH }}#${DK_REPO_NFS_PATH}#g" \
-		-e "s#{{ DK_REPO_DI_HOST }}#${DK_REPO_DI_HOST}#g" \
-		< ./vendor/grdk-core/services/repo/dind/Dockerfile \
-		> ./vendor/grdk-core/services/repo/dind/_Dockerfile
-	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-repo-dind:latest -f ./vendor/grdk-core/services/repo/dind/_Dockerfile ./vendor/grdk-core/services/repo/dind/
-	echo "GRDK-REPO-DIND - PUSH -> REPO-DI"
-	docker push ${DK_REPO_DI_HOST}:5000/grdk-repo-dind:latest
-else
-	echo "GRDK-REPO-DIND - BUILD skiped"
+	### GRDK-REPO-RUNNER-1 (GITLAB)
+	DK_REPO_RUNNER_CID=$(docker container ls -q -f name=grdk-repo_runner-1)
+	if [ `docker exec -it $DK_REPO_RUNNER_CID cat /etc/gitlab-runner/config.toml | grep -c 'grdk-repo-runner-1'` != "0" ]; then
+		echo "GRDK-REPO-RUNNER-1 - OK"
+	else
+		echo "GRDK-REPO-RUNNER-1 - REGISTER"
+		read -p "Informe o Runner registration token: " DK_REPO_RUNNER_TK
+		docker exec -it $DK_REPO_RUNNER_CID /usr/bin/gitlab-runner register \
+			--non-interactive \
+			--description "grdk-repo-runner-1" \
+			--url "http://${DK_REPO_HOST}:8000/" \
+			--registration-token "${DK_REPO_RUNNER_TK}" \
+			--executor "docker" \
+			--docker-image docker:latest \
+			--docker-privileged \
+			--docker-volumes "/var/run/docker.sock:/var/run/docker.sock" \
+			--tag-list "grdk,grdkrr1" \
+			--run-untagged \
+			--locked="false"
+	fi
+
+	### GRDK-REPO-DIND (GITLAB)
+	set +e
+	grdk_qbuild_img grdk-repo-dind
+	ret_b=$?
+	set -e
+	if [ $ret_b = 1 ]; then
+		echo "GRDK-REPO-DIND - RUN BUILD"
+		sed -e "s#{{ DK_SERVER_NODE_ROLE }}#${DK_SERVER_NODE_ROLE}#g" \
+			-e "s#{{ DK_SERVER_IP }}#${DK_SERVER_IP}#g" \
+			-e "s#{{ DK_SERVER_INST_NFS }}#${DK_SERVER_INST_NFS}#g" \
+			-e "s#{{ DK_LOGGER_HOST }}#${DK_LOGGER_HOST}#g" \
+			-e "s#{{ DK_REPO_HOST }}#${DK_REPO_HOST}#g" \
+			-e "s#{{ DK_REPO_NFS_HOST }}#${DK_REPO_NFS_HOST}#g" \
+			-e "s#{{ DK_REPO_NFS_PATH }}#${DK_REPO_NFS_PATH}#g" \
+			-e "s#{{ DK_REPO_DI_HOST }}#${DK_REPO_DI_HOST}#g" \
+			< ./vendor/grdk-core/services/repo/dind/Dockerfile \
+			> ./vendor/grdk-core/services/repo/dind/_Dockerfile
+		docker build -t ${DK_REPO_DI_HOST}:5000/grdk-repo-dind:latest -f ./vendor/grdk-core/services/repo/dind/_Dockerfile ./vendor/grdk-core/services/repo/dind/
+		echo "GRDK-REPO-DIND - PUSH -> REPO-DI"
+		docker push ${DK_REPO_DI_HOST}:5000/grdk-repo-dind:latest
+	else
+		echo "GRDK-REPO-DIND - BUILD skiped"
+	fi
+
 fi
 
 ### GRDK-LOGGER (GRAYLOG)
