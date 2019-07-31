@@ -18,7 +18,8 @@ DK_INSTALL_TYPE="empty"
 DK_INSTALL_PATH="${curr_dir}"
 DK_BUILD_PATH="${curr_dir}/build"
 DK_SERVER_NODE_ROLE="empty"
-DK_SERVER_IP="192.168.0.1"
+DK_SERVER_IP=$(hostname -i | awk '{print $1}')
+DK_SERVER_HOST=$(hostname -s | awk '{print $1}')
 DK_SERVER_DNS="192.168.0.1"
 DK_SERVER_INST_NFS="Y"
 DK_LOGGER_HOST="logger.domain"
@@ -50,8 +51,10 @@ else
 	exit 1
 fi
 
-read -p "[SERVER] - Informe o IP deste servidor: [${DK_SERVER_IP}] " -e answer
+read -p "[SERVER] - Informe o IP local deste servidor: [${DK_SERVER_IP}] " -e answer
 DK_SERVER_IP=${answer:-${DK_SERVER_IP}}
+read -p "[SERVER] - Informe o HOST local deste servidor: [${DK_SERVER_HOST}] " -e answer
+DK_SERVER_HOST=${answer:-${DK_SERVER_HOST}}
 read -p "[SERVER] - Informe o IP do servidor DNS: [${DK_SERVER_DNS}] " -e answer
 DK_SERVER_DNS=${answer:-${DK_SERVER_DNS}}
 
@@ -91,6 +94,7 @@ export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
 export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
 export DK_SERVER_IP="${DK_SERVER_IP}"
+export DK_SERVER_HOST="${DK_SERVER_HOST}"
 export DK_SERVER_DNS="${DK_SERVER_DNS}"
 export DK_SERVER_INST_NFS="${DK_SERVER_INST_NFS}"
 export DK_LOGGER_HOST="${DK_LOGGER_HOST}"
@@ -127,6 +131,7 @@ export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
 export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
 export DK_SERVER_IP="${DK_SERVER_IP}"
+export DK_SERVER_HOST="${DK_SERVER_HOST}"
 export DK_SERVER_DNS="${DK_SERVER_DNS}"
 export DK_REPO_INST_GL="${DK_REPO_INST_GL}"
 export DK_REPO_HOST="${DK_REPO_HOST}"
