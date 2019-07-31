@@ -117,6 +117,27 @@ echo "Use TOKEN ${SWARM_TOKEN}"
 SWARM_MASTER_IP=$(docker info --format "{{.Swarm.NodeAddr}}")
 echo "Swarm master IP: ${SWARM_MASTER_IP}"
 
+### DOCKER-NODE-LABELS
+#DK_SERVER_HOST=$(docker info --format "{{.Name}}")
+CHECK_LABEL=$(docker node inspect -f '{{ .Spec.Labels }}' $DK_SERVER_HOST | grep 'grdkm:true' | wc -l)
+if [[ "$CHECK_LABEL" -gt 0 ]]; then
+	echo "DOCKER-NODE-LABELS - grdkm skiped"
+else
+	echo "DOCKER-NODE-LABELS - ADD grdkm"
+	docker node update --label-add grdkm=true $DK_SERVER_HOST
+fi
+CHECK_LABEL=$(docker node inspect -f '{{ .Spec.Labels }}' $DK_SERVER_HOST | grep 'grdkw:true' | wc -l)
+if [[ "$CHECK_LABEL" -gt 0 ]]; then
+	echo "DOCKER-NODE-LABELS - grdkw already exists"
+else
+	read -p "Adicionar label Worker (grdkw)? (Y|n) [n] " answer
+	answer=${answer:-n}
+	if [ "$answer" = "Y" ]; then
+		echo "DOCKER-NODE-LABELS - ADD grdkw"
+		docker node update --label-add grdkw=true $DK_SERVER_HOST
+	fi
+fi
+
 ### CALLBACK POST INSTALL
 for entry in "./vendor/grdk-core/services"/*
 do
