@@ -55,7 +55,6 @@ if [[ `service --status-all | grep 'docker-volume-netshare'` ]]; then
 fi
 
 ### SWARM JOIN
-
 docker swarm join --token ${DK_SWARM_TOKEN} ${DK_SWARM_IP}:2377
 
 ### CALLBACK POST INSTALL
