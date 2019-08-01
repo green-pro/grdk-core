@@ -20,6 +20,32 @@ set -e
 
 ### AUTOIMPORT IMAGES
 echo "AUTOIMPORT IMAGES"
+for entry in "./vendor/grdk-core/services"/*
+do
+	if [ -d "$entry" ]; then
+		if [ -f "${entry}/autoimport_images.conf" ]; then
+			echo "Processing AutoimportImages: ${entry}/autoimport_images.conf"
+			for cpimg in `cat $entry/autoimport_images.conf`; do
+				echo "Image: ${cpimg}"
+				imgname="${cpimg%:*}"
+				imgtag="${cpimg##*:}"
+				if [ "$imgname" = "$imgtag" ]; then
+					imgtag=latest
+				fi
+				echo "    name: ${imgname}"
+				echo "    tag: ${imgtag}"
+				imginfo=$(curl -sS "http://${DK_REPO_DI_HOST}:5000/v2/${imgname}/tags/list")
+				imgtagexists=$(echo $imginfo | jq -r 'select(has("tags")) | .tags | to_entries | .[] | select(.value == "'$imgtag'") | .value' | wc -l)
+				if [ $imgtagexists == 1 ]; then
+					echo "A imagem \"${cpimg}\" já existe em ${DK_REPO_DI_HOST}"
+				else
+					docker pull ${cpimg}
+					docker images ${cpimg} --format "docker tag {{.Repository}}:{{.Tag}} ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}} | docker push ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}}" | bash
+				fi
+			done
+		fi
+	fi
+done
 for entry in "./src/services"/*
 do
 	if [ -d "$entry" ]; then
