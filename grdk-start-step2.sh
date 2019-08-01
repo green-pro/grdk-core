@@ -40,7 +40,10 @@ do
 					echo "A imagem \"${cpimg}\" já existe em ${DK_REPO_DI_HOST}"
 				else
 					docker pull ${cpimg}
-					docker images ${cpimg} --format "docker tag {{.Repository}}:{{.Tag}} ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}} | docker push ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}}" | bash
+					sleep 3s
+					docker images ${cpimg} --format "docker tag {{.Repository}}:{{.Tag}} ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}}" | bash
+					sleep 3s
+					docker images ${cpimg} --format "docker push ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}}" | bash
 				fi
 			done
 		fi
@@ -66,7 +69,10 @@ do
 					echo "A imagem \"${cpimg}\" já existe em ${DK_REPO_DI_HOST}"
 				else
 					docker pull ${cpimg}
-					docker images ${cpimg} --format "docker tag {{.Repository}}:{{.Tag}} ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}} | docker push ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}}" | bash
+					sleep 3s
+					docker images ${cpimg} --format "docker tag {{.Repository}}:{{.Tag}} ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}}" | bash
+					sleep 3s
+					docker images ${cpimg} --format "docker push ${DK_REPO_DI_HOST}:5000/{{.Repository}}:{{.Tag}}" | bash
 				fi
 			done
 		fi
