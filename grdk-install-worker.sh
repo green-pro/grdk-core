@@ -9,7 +9,7 @@ if command_exists docker; then
 	echo "Docker already installed"
 	echo $(docker -v | cut -d ' ' -f3 | cut -d ',' -f1)
 else
-	curl -sSL https://get.docker.com | VERSION=18.06.3-ce sh
+	curl -sSL https://get.docker.com | VERSION=$DK_DOCKER_VERSION sh
 	echo "{\"dns\":[\"${DK_SERVER_DNS}\"],\"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"]}" > /etc/docker/daemon.json
 fi
 
