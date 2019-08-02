@@ -127,6 +127,21 @@ if [ "$DK_REPO_INST_GL" = "Y" ]; then
 			--locked="false"
 	fi
 
+	### GRDK-REPO-DOCKER (GITLAB)
+	set +e
+	grdk_qbuild_img grdk-repo-docker
+	ret_b=$?
+	set -e
+	if [ $ret_b = 1 ]; then
+		echo "GRDK-REPO-DOCKER - RUN BUILD"
+		grdk_replace_all_vars ./vendor/grdk-core/services/repo/docker/Dockerfile ./vendor/grdk-core/services/repo/docker/_Dockerfile
+		docker build -t ${DK_REPO_DI_HOST}:5000/grdk-repo-docker:latest -f ./vendor/grdk-core/services/repo/docker/_Dockerfile ./vendor/grdk-core/services/repo/docker/
+		echo "GRDK-REPO-DOCKER - PUSH -> REPO-DI"
+		docker push ${DK_REPO_DI_HOST}:5000/grdk-repo-docker:latest
+	else
+		echo "GRDK-REPO-DOCKER - BUILD skiped"
+	fi
+
 	### GRDK-REPO-DIND (GITLAB)
 	set +e
 	grdk_qbuild_img grdk-repo-dind
