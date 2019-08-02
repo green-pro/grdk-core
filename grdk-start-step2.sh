@@ -134,16 +134,7 @@ if [ "$DK_REPO_INST_GL" = "Y" ]; then
 	set -e
 	if [ $ret_b = 1 ]; then
 		echo "GRDK-REPO-DIND - RUN BUILD"
-		sed -e "s#{{ DK_SERVER_NODE_ROLE }}#${DK_SERVER_NODE_ROLE}#g" \
-			-e "s#{{ DK_SERVER_IP }}#${DK_SERVER_IP}#g" \
-			-e "s#{{ DK_SERVER_INST_NFS }}#${DK_SERVER_INST_NFS}#g" \
-			-e "s#{{ DK_LOGGER_HOST }}#${DK_LOGGER_HOST}#g" \
-			-e "s#{{ DK_REPO_HOST }}#${DK_REPO_HOST}#g" \
-			-e "s#{{ DK_REPO_NFS_HOST }}#${DK_REPO_NFS_HOST}#g" \
-			-e "s#{{ DK_REPO_NFS_PATH }}#${DK_REPO_NFS_PATH}#g" \
-			-e "s#{{ DK_REPO_DI_HOST }}#${DK_REPO_DI_HOST}#g" \
-			< ./vendor/grdk-core/services/repo/dind/Dockerfile \
-			> ./vendor/grdk-core/services/repo/dind/_Dockerfile
+		grdk_replace_all_vars ./vendor/grdk-core/services/repo/dind/Dockerfile ./vendor/grdk-core/services/repo/dind/_Dockerfile
 		docker build -t ${DK_REPO_DI_HOST}:5000/grdk-repo-dind:latest -f ./vendor/grdk-core/services/repo/dind/_Dockerfile ./vendor/grdk-core/services/repo/dind/
 		echo "GRDK-REPO-DIND - PUSH -> REPO-DI"
 		docker push ${DK_REPO_DI_HOST}:5000/grdk-repo-dind:latest
@@ -216,16 +207,7 @@ if [ ! "$(docker ps -q -f name=grdk-proxy)" ]; then
 		docker start grdk-proxy
 	else
 		echo "GRDK-PROXY - UP"
-		sed -e "s#{{ DK_SERVER_NODE_ROLE }}#${DK_SERVER_NODE_ROLE}#g" \
-			-e "s#{{ DK_SERVER_IP }}#${DK_SERVER_IP}#g" \
-			-e "s#{{ DK_SERVER_INST_NFS }}#${DK_SERVER_INST_NFS}#g" \
-			-e "s#{{ DK_LOGGER_HOST }}#${DK_LOGGER_HOST}#g" \
-			-e "s#{{ DK_REPO_HOST }}#${DK_REPO_HOST}#g" \
-			-e "s#{{ DK_REPO_NFS_HOST }}#${DK_REPO_NFS_HOST}#g" \
-			-e "s#{{ DK_REPO_NFS_PATH }}#${DK_REPO_NFS_PATH}#g" \
-			-e "s#{{ DK_REPO_DI_HOST }}#${DK_REPO_DI_HOST}#g" \
-			< ./vendor/grdk-core/services/proxy/docker-compose.yml \
-			> ./vendor/grdk-core/services/proxy/_docker-compose.yml
+		grdk_replace_all_vars ./vendor/grdk-core/services/proxy/docker-compose.yml ./vendor/grdk-core/services/proxy/_docker-compose.yml
 		#docker run --name grdk-proxy -p 80:80 -p 8080:8080 -d repo-di.grdk:5000/grdk-proxy:latest
 		docker-compose -f ./vendor/grdk-core/services/proxy/_docker-compose.yml up -d
 		sleep 5s

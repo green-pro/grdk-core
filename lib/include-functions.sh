@@ -68,6 +68,22 @@ grdk_replace_vars()
 		< $1 > $2
 }
 
+grdk_replace_all_vars()
+{
+	filein="${1}"
+	fileout="${2}"
+	cmd=""
+	rescode=""
+	for varname in $(printenv | grep '^DK_' | awk -F "=" '{print $1}')
+	do
+		cmd=$cmd' -e "s#{{ '$varname' }}#${'$varname'}#g"'
+	done
+	cmd='sed '$cmd" < ${filein} > ${fileout}"
+	echo $cmd | sh
+	rescode=$?
+	return ${rescode}
+}
+
 grdk_yaml2json()
 {
 	perl -MYAML::XS=LoadFile -MJSON::XS=encode_json -e 'for (@ARGV) { for (LoadFile($_)) { print encode_json($_),"\n" } }' \
