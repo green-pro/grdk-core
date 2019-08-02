@@ -1,6 +1,6 @@
 # grdk-repo-docker
 
-GRDKRepoDocker - Instalação do Docker para GRDKRepoRunner com .gitlab-ci.yml
+GRDKRepoDocker - Imagem do Docker para GRDKRepoRunner com .gitlab-ci.yml
 
 ## Pré-requisitos
 

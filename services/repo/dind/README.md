@@ -1,6 +1,6 @@
 # grdk-repo-dind
 
-GRDKRepoDinD - Instalação do Docker in Docker para GRDKRepoRunner com .gitlab-ci.yml
+GRDKRepoDinD - Imagem do Docker in Docker para GRDKRepoRunner com .gitlab-ci.yml
 
 ## Pré-requisitos
 
