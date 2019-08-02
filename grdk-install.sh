@@ -13,10 +13,14 @@ if [ ! -d "./tmp" ]; then
 	mkdir -p ./tmp
 fi
 
-# DEFAULT ENV VARS
-DK_INSTALL_TYPE="empty"
+# DEFINED ENV VARS
+DK_VERSION="0.1.0"
+DK_DOCKER_VERSION="18.06.3"
 DK_INSTALL_PATH="${curr_dir}"
 DK_BUILD_PATH="${curr_dir}/build"
+
+# DEFAULT ENV VARS
+DK_INSTALL_TYPE="empty"
 DK_SERVER_NODE_ROLE="empty"
 DK_SERVER_IP=$(hostname -i | awk '{print $1}')
 DK_SERVER_HOST=$(hostname -s | awk '{print $1}')
@@ -90,6 +94,8 @@ if [ "$DK_INSTALL_TYPE" = "M" ]; then
 
 	cat > ./environment.sh << EOF
 #!/bin/bash
+export DK_VERSION="${DK_VERSION}"
+export DK_DOCKER_VERSION="${DK_DOCKER_VERSION}"
 export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
 export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
@@ -127,6 +133,8 @@ elif [ "$DK_INSTALL_TYPE" = "w" ]; then
 
 	cat > ./environment.sh << EOF
 #!/bin/bash
+export DK_VERSION="${DK_VERSION}"
+export DK_DOCKER_VERSION="${DK_DOCKER_VERSION}"
 export DK_INSTALL_PATH="${DK_INSTALL_PATH}"
 export DK_BUILD_PATH="${DK_BUILD_PATH}"
 export DK_SERVER_NODE_ROLE="${DK_SERVER_NODE_ROLE}"
