@@ -180,11 +180,12 @@ ret_b=$?
 set -e
 if [ $ret_b = 1 ]; then
 	echo "GRDK-PROXY - RUN BUILD"
-	cp ./src/services/proxy/hosts.conf ./vendor/grdk-core/services/proxy/
-	cp ./src/services/proxy/e_* ./vendor/grdk-core/services/proxy/
-	file_acme_config=./vendor/grdk-core/services/proxy/acme.conf
+	cp ./vendor/grdk-core/services/proxy/* ./build/services/proxy/
+	cp ./src/services/proxy/hosts.conf ./build/services/proxy/
+	cp ./src/services/proxy/e_* ./build/services/proxy/
+	file_acme_config=./build/services/proxy/acme.conf
 	if [ -f "$file_acme_config" ]; then
-		for acme_host in `cat ./vendor/grdk-core/services/proxy/hosts.conf`; do
+		for acme_host in `cat ./build/services/proxy/hosts.conf`; do
 			echo "ACME CONF for ${acme_host}"
 			cat >> $file_acme_config << EOF
 #
@@ -199,7 +200,7 @@ EOF
 		echo "O arquivo ${file_acme_config} foi configurado com ${acme_host}"
 		done
 	fi
-	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-proxy:latest ./vendor/grdk-core/services/proxy/
+	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-proxy:latest ./build/services/proxy/
 	echo "GRDK-PROXY - PUSH -> REPO-DI"
 	docker push ${DK_REPO_DI_HOST}:5000/grdk-proxy:latest
 else
@@ -222,9 +223,9 @@ if [ ! "$(docker ps -q -f name=grdk-proxy)" ]; then
 		docker start grdk-proxy
 	else
 		echo "GRDK-PROXY - UP"
-		grdk_replace_all_vars ./vendor/grdk-core/services/proxy/docker-compose.yml ./vendor/grdk-core/services/proxy/_docker-compose.yml
+		#grdk_replace_all_vars ./vendor/grdk-core/services/proxy/docker-compose.yml ./vendor/grdk-core/services/proxy/_docker-compose.yml
 		#docker run --name grdk-proxy -p 80:80 -p 8080:8080 -d repo-di.grdk:5000/grdk-proxy:latest
-		docker-compose -f ./vendor/grdk-core/services/proxy/_docker-compose.yml up -d
+		docker-compose -f ./build/services/proxy/_docker-compose.yml up -d
 		sleep 5s
 		docker exec -it grdk-proxy start-servers.sh
 	fi

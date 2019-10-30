@@ -13,6 +13,9 @@ fi
 if [ ! -d "${DK_INSTALL_PATH}/build" ]; then
 	mkdir -p $DK_INSTALL_PATH/build
 fi
+rm -Rf $DK_INSTALL_PATH/build
+mkdir -p $DK_INSTALL_PATH/build
+
 if [ ! -d "${DK_INSTALL_PATH}/tmp" ]; then
 	mkdir -p $DK_INSTALL_PATH/tmp
 fi
