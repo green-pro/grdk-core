@@ -65,6 +65,7 @@ grdk_replace_vars()
 		-e "s#{{ DK_REPO_NFS_HOST }}#${DK_REPO_NFS_HOST}#g" \
 		-e "s#{{ DK_REPO_NFS_PATH }}#${DK_REPO_NFS_PATH}#g" \
 		-e "s#{{ DK_REPO_DI_HOST }}#${DK_REPO_DI_HOST}#g" \
+		-e "s#{{ DK_MSG_HOST }}#${DK_MSG_HOST}#g" \
 		< $1 > $2
 }
 
