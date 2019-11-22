@@ -120,7 +120,8 @@ grdk_check_volumes()
 	done
 }
 
-grdk_qbuild_img() {
+grdk_qbuild_img()
+{
 	# PARAMS
 	PAR_IMG_NAME=$1
 	# BODY
@@ -135,4 +136,38 @@ grdk_qbuild_img() {
 		buildimg=1
 	fi
 	return $buildimg
+}
+
+grdk_logger_send()
+{
+	# PARAMS
+	PAR_MESSAGE=$1
+	# VARS
+	level=6
+	date=$(date +'%s.%N')
+	# BODY
+	read -r -d '' gelf_message <<EOF
+{
+  "version": "1.0",
+  "host": "${DK_SERVER_HOST}",
+  "short_message": "${PAR_MESSAGE}",
+  "full_message": "${PAR_MESSAGE}",
+  "timestamp": ${date},
+  "level": ${level},
+  "_DK_VERSION": "${DK_VERSION}",
+  "_DK_SERVER_NODE_ROLE": "${DK_SERVER_NODE_ROLE}",
+  "_DK_SERVER_IP": "${DK_SERVER_IP}"
+}
+EOF
+	echo  "${gelf_message}"| gzip -c -f - | nc -w 1 -u $DK_LOGGER_HOST 12201
+	return 0
+}
+
+grdk_msg_send()
+{
+	# PARAMS
+	PAR_MESSAGE=$1
+	# BODY
+	curl -X POST --data-urlencode "to_channel_optional=channelname" --data-urlencode "text=${PAR_MESSAGE}" http://$DK_MSG_HOST:8002/send.php?profile=1
+	return 0
 }
