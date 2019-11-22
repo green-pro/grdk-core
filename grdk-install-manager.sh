@@ -158,4 +158,5 @@ done
 
 ### OTHERS
 cp ./vendor/grdk-core/scripts/grdk-cron-daily-cleanup /etc/cron.daily/
+cp ./vendor/grdk-core/scripts/grdk-cron-hourly-check-services /etc/cron.hourly/
 service cron restart
