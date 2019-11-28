@@ -9,8 +9,8 @@ services:
       - "443:443"
       - "8080:8080"
     volumes:
-      - /mnt/storage-1/grdk-proxy/certboot/etc:/etc/letsencrypt
-      - /mnt/storage-1/grdk-proxy/certboot/www:/var/www/acme
+      - /mnt/storage-local/grdk-proxy/certboot/etc:/etc/letsencrypt
+      - /mnt/storage-local/grdk-proxy/certboot/www:/var/www/acme
     environment:
       - DK_MSG_HOST={{ DK_MSG_HOST }}
     logging:
