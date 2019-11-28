@@ -4,6 +4,8 @@ CHECK_FILES=$(ls -la /etc/nginx/conf.d/ | grep -E 'e\_.+\.conf' | wc -l)
 if [[ "$CHECK_FILES" -gt 0 ]]; then
 	rm /etc/nginx/conf.d/e_*.conf
 fi
+
+mkdir -p /var/www/acme/.well-known/acme-challenge
 cp /acme.conf /etc/nginx/conf.d/
 file_acme_config=/etc/nginx/conf.d/acme.conf
 if [ -f "$file_acme_config" ]; then
@@ -22,14 +24,9 @@ EOF
 	echo "O arquivo ${file_acme_config} foi configurado com ${acme_host}"
 	done
 fi
-acme-client.sh
-cp /e_*.conf /etc/nginx/conf.d/
-nginx -s reload
 
-SERVICE="crond"
-if pgrep -x "$SERVICE" > /dev/null; then
-	echo "$SERVICE is running"
-else
-	echo "$SERVICE stopped, starting..."
-	crond -b
-fi
+# TODO copy default and only cert exists
+cp /e_*.conf /etc/nginx/conf.d/
+
+nginx -s reload
+curl http://$DK_MSG_HOST:8002/send.php?profile=1\&text=GrdkProxyReloaded
