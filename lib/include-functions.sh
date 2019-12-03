@@ -11,6 +11,7 @@ grdk_containers_checkup()
 	PAR_CONT_NAME=$1
 	PAR_MAX_ATTEMPTS=$2
 	PAR_MULT=$3
+	PAR_SEARCH_TYPE=$4
 	PAR_DELAY=2
 	# CHECK
 	sleep 1
@@ -20,7 +21,13 @@ grdk_containers_checkup()
 	do
 		echo $proc_bar
 		proc_bar="${proc_bar}."
-		CONT_UP=$(docker ps -q -f name=$PAR_CONT_NAME)
+		if [[ "$PAR_SEARCH_TYPE" = "begin" ]]; then
+			CONT_UP=$(docker ps -q -f name=^/$PAR_CONT_NAME)
+		elif [[ "$PAR_SEARCH_TYPE" = "exact" ]]; then
+			CONT_UP=$(docker ps -q -f name=^/$PAR_CONT_NAME\$)
+		else
+			CONT_UP=$(docker ps -q -f name=$PAR_CONT_NAME)
+		fi
 		COUNT_CONT_UP=$(echo $CONT_UP | wc -w | awk '{print $1}')
 		# echo "COUNT_CONT_UP = ${COUNT_CONT_UP}"
 		if [[ "$COUNT_CONT_UP" = "$PAR_MULT" ]]; then
