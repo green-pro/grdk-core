@@ -156,7 +156,15 @@ do
 	fi
 done
 
-### OTHERS
+### CRON JOBS
+
+# TODO rm all script cron
+# rm /etc/cron.daily/grdk-cron-*
+
 cp ./vendor/grdk-core/scripts/grdk-cron-daily-cleanup /etc/cron.daily/
 cp ./vendor/grdk-core/scripts/grdk-cron-hourly-check-services /etc/cron.hourly/
+
+# TODO loop services
+cp ./vendor/grdk-core/services/proxy/scripts/grdk-cron-daily-proxy-certbot /etc/cron.daily/
+
 service cron restart
