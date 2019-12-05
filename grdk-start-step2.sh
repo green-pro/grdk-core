@@ -180,7 +180,7 @@ ret_b=$?
 set -e
 if [ $ret_b = 1 ]; then
 	echo "GRDK-PROXY - RUN BUILD"
-	cp ./vendor/grdk-core/services/proxy/* ./build/services/proxy/
+	cp -r ./vendor/grdk-core/services/proxy/* ./build/services/proxy/
 	cp ./src/services/proxy/hosts.conf ./build/services/proxy/
 	cp ./src/services/proxy/e_* ./build/services/proxy/
 	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-proxy:latest ./build/services/proxy/
