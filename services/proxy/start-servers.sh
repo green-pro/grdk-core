@@ -25,8 +25,36 @@ EOF
 	done
 fi
 
-# TODO copy default and only cert exists
-cp /e_*.conf /etc/nginx/conf.d/
+### COPY e_*.conf files
+
+for entry in /e_*.conf; do
+	if [ -f "${entry}" ]; then
+		file="${entry##*/}"
+		echo "### File ${file}"
+		err=0
+		line=$(cat $entry | egrep "^(\s|\t)*ssl_certificate_key\s.+\.pem" | sed -e ""s#[[:space:]]##g"" -e "s#ssl_certificate_key##g" -e "s#;##g")
+		if [[ $line ]]; then
+			echo "   Certificate is required, searching files..."
+			for arq in $line; do
+				echo "   ${arq}"
+				if [ -f "${arq}" ]; then
+					echo "   Certificate found"
+				else
+					echo "   Certificate not found"
+					err=1
+				fi
+			done
+		else
+			echo "   Certificate not required, skip check files"
+		fi
+		if [ "$err" -gt 0 ]; then
+			echo "   Copy ${file} skiped"
+		else
+			echo "   Copying ${file}..."
+			cp $entry /etc/nginx/conf.d/
+		fi
+	fi
+done
 
 nginx -s reload
 curl http://$DK_MSG_HOST:8002/send.php?profile=1\&text=GrdkProxyReloaded
