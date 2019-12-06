@@ -14,7 +14,7 @@ if [ ! -d "./tmp" ]; then
 fi
 
 # DEFINED ENV VARS
-DK_VERSION="0.2.3"
+DK_VERSION=$(cat ./vendor/grdk-core/VERSION)
 DK_DOCKER_VERSION="18.06.3"
 DK_INSTALL_PATH="${curr_dir}"
 DK_BUILD_PATH="${curr_dir}/build"
