@@ -24,7 +24,7 @@ docker run -it --rm --name grdk-proxy_certbot \
  -v "/mnt/storage-local/grdk-proxy/certboot/etc:/etc/letsencrypt" \
  -v "/mnt/storage-local/grdk-proxy/certboot/lib:/var/lib/letsencrypt" \
  -v "/mnt/storage-local/grdk-proxy/certboot/www:/var/www/acme" \
- certbot/certbot:v0.40.1 renew --webroot --webroot-path /var/www/acme \
+ ${DK_REPO_DI_HOST}:5000/certbot/certbot:v0.40.1 renew --webroot --webroot-path /var/www/acme \
  --pre-hook 'echo > /etc/letsencrypt/deploy_hook_renewed.txt' \
  --deploy-hook 'echo $RENEWED_DOMAINS >> /etc/letsencrypt/deploy_hook_renewed.txt'
 
