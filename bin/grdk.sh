@@ -1,5 +1,7 @@
 #!/bin/bash
 
+### VARS
+
 prog_name=$(basename $0)
 
 ### HELP
