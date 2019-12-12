@@ -165,87 +165,10 @@ fi
 
 cmd="ln -s ${DK_INSTALL_PATH}/vendor/grdk-core/bin/grdk.sh /usr/local/bin/grdk"
 echo $cmd
+$cmd
 cmd="chmod +x /usr/local/bin/grdk"
 echo $cmd
 $cmd
 
 ### CRON JOBS
-
-CHECK_FILES=$(ls -la /etc/cron.daily/ | grep -E 'grdk-cron-.+' | wc -l)
-if [[ "$CHECK_FILES" -gt 0 ]]; then
-	echo "Scripts cron.daily deleted"
-	rm /etc/cron.daily/grdk-cron-*
-fi
-
-CHECK_FILES=$(ls -la /etc/cron.hourly/ | grep -E 'grdk-cron-.+' | wc -l)
-if [[ "$CHECK_FILES" -gt 0 ]]; then
-	echo "Scripts cron.hourly deleted"
-	rm /etc/cron.hourly/grdk-cron-*
-fi
-
-if [ -d "${DK_INSTALL_PATH}/vendor/grdk-core/scripts" ]; then
-	for entry2 in "${DK_INSTALL_PATH}/vendor/grdk-core/scripts"/*; do
-		if [ -f "${entry2}" ]; then
-			file="${entry2##*/}"
-			file_name="${file%.*}"
-			file_ext=$([[ "$file" = *.* ]] && echo "${file##*.}" || echo '')
-			if [[ $file == grdk-cron-daily-* ]]; then
-				cmd="ln -s ${entry2} /etc/cron.daily/${file_name}"
-				echo $cmd
-				$cmd
-			elif [[ $file == grdk-cron-hourly-* ]]; then
-				cmd="ln -s ${entry2} /etc/cron.hourly/${file_name}"
-				echo $cmd
-				$cmd
-			fi
-		fi
-	done
-fi
-
-for entry in "${DK_INSTALL_PATH}/vendor/grdk-core/services"/*; do
-	if [ -d "$entry" ]; then
-		if [ -d "$entry/scripts" ]; then
-			for entry2 in "${entry}/scripts"/*; do
-				if [ -f "${entry2}" ]; then
-					file="${entry2##*/}"
-					file_name="${file%.*}"
-					file_ext=$([[ "$file" = *.* ]] && echo "${file##*.}" || echo '')
-					if [[ $file == grdk-cron-daily-* ]]; then
-						cmd="ln -s ${entry2} /etc/cron.daily/${file_name}"
-						echo $cmd
-						$cmd
-					elif [[ $file == grdk-cron-hourly-* ]]; then
-						cmd="ln -s ${entry2} /etc/cron.hourly/${file_name}"
-						echo $cmd
-						$cmd
-					fi
-				fi
-			done
-		fi
-	fi
-done
-
-for entry in "${DK_INSTALL_PATH}/src/services"/*; do
-	if [ -d "$entry" ]; then
-		if [ -d "$entry/scripts" ]; then
-			for entry2 in "${entry}/scripts"/*; do
-				if [ -f "${entry2}" ]; then
-					file="${entry2##*/}"
-					file_name="${file%.*}"
-					file_ext=$([[ "$file" = *.* ]] && echo "${file##*.}" || echo '')
-					if [[ $file == grdk-cron-daily-* ]]; then
-						cmd="ln -s ${entry2} /etc/cron.daily/${file_name}"
-						echo $cmd
-						$cmd
-					elif [[ $file == grdk-cron-hourly-* ]]; then
-						cmd="ln -s ${entry2} /etc/cron.hourly/${file_name}"
-						echo $cmd
-						$cmd
-					fi
-				fi
-			done
-		fi
-	fi
-done
-
-service cron restart
+grdk install cron
