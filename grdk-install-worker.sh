@@ -36,9 +36,14 @@ if [[ ! `ps ax | grep dockerd | grep -v grep` ]]; then
 	sleep 10
 	echo "Service Docker started"
 else
-	service docker restart
-	sleep 10
-	echo "Service Docker restarted"
+	echo "Service Docker already started"
+	read -p "Restart service Docker? (Y|n) [n] " answer
+	answer=${answer:-n}
+	if [ "$answer" = "Y" ]; then
+		service docker restart
+		sleep 10
+		echo "Service Docker restarted"
+	fi
 fi
 
 if [[ ! `ps ax | grep docker-volume-netshare | grep -v grep` ]]; then
@@ -55,7 +60,11 @@ if [[ `service --status-all | grep 'docker-volume-netshare'` ]]; then
 fi
 
 ### SWARM JOIN
-docker swarm join --token ${DK_SWARM_TOKEN} ${DK_SWARM_IP}:2377
+read -p "Docker Swarm Join? (Y|n) [Y] " answer
+answer=${answer:-Y}
+if [ "$answer" = "Y" ]; then
+	docker swarm join --token ${DK_SWARM_TOKEN} ${DK_SWARM_IP}:2377
+fi
 
 ### CALLBACK POST INSTALL
 for entry in "./vendor/grdk-core/services"/*
