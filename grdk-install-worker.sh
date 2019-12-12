@@ -75,6 +75,19 @@ do
 	fi
 done
 
-### OTHERS
-cp ./vendor/grdk-core/scripts/grdk-cron-daily-cleanup /etc/cron.daily/
-service cron restart
+### GRDK BIN
+
+if [ -f "/usr/local/bin/grdk" ]; then
+	echo "Scripts bin grdk deleted"
+	rm /usr/local/bin/grdk
+fi
+
+cmd="ln -s ${DK_INSTALL_PATH}/vendor/grdk-core/bin/grdk.sh /usr/local/bin/grdk"
+echo $cmd
+$cmd
+cmd="chmod +x /usr/local/bin/grdk"
+echo $cmd
+$cmd
+
+### CRON JOBS
+grdk install cron
