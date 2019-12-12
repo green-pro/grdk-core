@@ -10,6 +10,7 @@ _help()
 {
 	echo "Usage: $prog_name <service>"
 	echo "Services:"
+	echo "    install"
 	echo "    proxy"
 	echo ""
 	echo "For help with each service run:"
