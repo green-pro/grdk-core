@@ -28,6 +28,9 @@ case $_service in
 	"" | "-h" | "--help")
 		_help
 		;;
+	"-v" | "--version")
+		echo $DK_VERSION
+		;;
 	*)
 		if [ -f ${DK_INSTALL_PATH}/vendor/grdk-core/services/${_service}/lib/lib-${_service}.sh ]; then
 			source ${DK_INSTALL_PATH}/vendor/grdk-core/services/${_service}/lib/lib-${_service}.sh
