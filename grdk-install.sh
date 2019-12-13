@@ -47,8 +47,18 @@ DK_DOCKER_VERSION="18.06.3"
 DK_INSTALL_PATH="${curr_dir}"
 DK_BUILD_PATH="${curr_dir}/build"
 
-read -p "Install Docker \"MANAGER\" or \"WORKER\"? (M/w) [${DK_INSTALL_TYPE}] " -e answer
-DK_INSTALL_TYPE=${answer:-${DK_INSTALL_TYPE}}
+echo "[GRDK] - VERSION: ${DK_VERSION}"
+echo "[GRDK] - DOCKER VERSION: ${DK_DOCKER_VERSION}"
+
+if [ "$DK_SERVER_NODE_ROLE" = "manager" ]; then
+	DK_INSTALL_TYPE="M"
+elif [ "$DK_SERVER_NODE_ROLE" = "worker" ]; then
+	DK_INSTALL_TYPE="w"
+else
+	read -p "[GRDK] - Install Docker \"M\" (MANAGER) or \"w\" (WORKER)? (M/w) " -e answer
+	DK_INSTALL_TYPE=${answer:-${DK_INSTALL_TYPE}}
+fi
+
 if [ "$DK_INSTALL_TYPE" = "M" ]; then
 	DK_SERVER_NODE_ROLE="manager"
 elif [ "$DK_INSTALL_TYPE" = "w" ]; then
@@ -57,6 +67,8 @@ else
 	echo "Nothing selected: \"M\" for DOCKER MANAGER or \"w\" for DOCKER WORKER"
 	exit 1
 fi
+
+echo "[GRDK] - DOCKER NODE ROLE: ${DK_SERVER_NODE_ROLE}"
 
 read -p "[SERVER] - Informe o IP local deste servidor: [${DK_SERVER_IP}] " -e answer
 DK_SERVER_IP=${answer:-${DK_SERVER_IP}}
