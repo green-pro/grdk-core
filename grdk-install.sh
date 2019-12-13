@@ -9,15 +9,12 @@ curr_dir="$(pwd)"
 if [ ! -d "./build" ]; then
 	mkdir -p ./build
 fi
+rm -Rf ./build
+mkdir -p ./build
+
 if [ ! -d "./tmp" ]; then
 	mkdir -p ./tmp
 fi
-
-# DEFINED ENV VARS
-DK_VERSION=$(cat ./vendor/grdk-core/VERSION)
-DK_DOCKER_VERSION="18.06.3"
-DK_INSTALL_PATH="${curr_dir}"
-DK_BUILD_PATH="${curr_dir}/build"
 
 # DEFAULT ENV VARS
 DK_INSTALL_TYPE="empty"
@@ -44,7 +41,13 @@ if [ -f "./environment.sh" ]; then
 	source ./environment.sh
 fi
 
-read -p "Install Docker \"MANAGER\" or \"WORKER\"? (M/w) " -e answer
+# DEFINED ENV VARS
+DK_VERSION=$(cat ./vendor/grdk-core/VERSION)
+DK_DOCKER_VERSION="18.06.3"
+DK_INSTALL_PATH="${curr_dir}"
+DK_BUILD_PATH="${curr_dir}/build"
+
+read -p "Install Docker \"MANAGER\" or \"WORKER\"? (M/w) [${DK_INSTALL_TYPE}] " -e answer
 DK_INSTALL_TYPE=${answer:-${DK_INSTALL_TYPE}}
 if [ "$DK_INSTALL_TYPE" = "M" ]; then
 	DK_SERVER_NODE_ROLE="manager"
