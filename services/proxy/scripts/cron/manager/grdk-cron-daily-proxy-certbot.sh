@@ -49,9 +49,10 @@ if [ -f "$deploy_hook_renewed" ]; then
 		(( rd++ ))
 	done
 	# Delete file (optional)
+	rm "$deploy_hook_renewed"
 fi
 if [[ "$rd" -gt 0 ]]; then
-	docker exec -it grdk-proxy start-servers.sh
+	docker exec grdk-proxy start-servers.sh
 	grdk_logger_send "[GrdkProxyCertbot] NGINX reloaded"
 else
 	grdk_logger_send "[GrdkProxyCertbot] NGINX skip reload"
