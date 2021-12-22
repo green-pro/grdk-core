@@ -62,7 +62,7 @@ fi
 if command_exists docker-compose; then
 	echo "Docker Composer already installed"
 else
-	curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+	curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 	chmod +x /usr/local/bin/docker-compose
 fi
 
@@ -135,7 +135,7 @@ CHECK_LABEL=$(docker node inspect -f '{{ .Spec.Labels }}' $DK_SERVER_HOST | grep
 if [[ "$CHECK_LABEL" -gt 0 ]]; then
 	echo "DOCKER-NODE-LABELS - grdkw already exists"
 else
-	read -p "Adicionar label Worker (grdkw)? (Y|n) [n] " answer
+	read -p "Adicionar label Worker (grdkw) nesse Manager? (Y|n) [n] " answer
 	answer=${answer:-n}
 	if [ "$answer" = "Y" ]; then
 		echo "DOCKER-NODE-LABELS - ADD grdkw"

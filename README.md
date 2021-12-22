@@ -13,5 +13,5 @@ GRDKCore - Biblioteca principal dos serviços Docker
 
 ## Pré-requisitos
 
-* Ubuntu Server 18.04
+* Ubuntu Server 20.04
 * GRDKInstallSkel
