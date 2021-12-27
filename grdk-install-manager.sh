@@ -82,8 +82,8 @@ if [[ ! `ps ax | grep dockerd | grep -v grep` ]]; then
 	echo "Service Docker started"
 else
 	echo "Service Docker already started"
-	read -p "Restart service Docker? (Y|n) [n] " answer
-	answer=${answer:-n}
+	read -p "Restart service Docker? (Y|n) [Y] " answer
+	answer=${answer:-Y}
 	if [ "$answer" = "Y" ]; then
 		service docker restart
 		sleep 10

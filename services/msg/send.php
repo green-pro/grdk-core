@@ -1,6 +1,7 @@
 <?php
 $SEND_TOKEN = null;
 $CI_SLACK_WEBHOOK_URL = getenv("CI_SLACK_WEBHOOK_URL");
+$CI_TEAMS_WEBHOOK_URL = getenv("CI_TEAMS_WEBHOOK_URL");
 
 $LOG_FILE = './send.log';
 define('LOG_FILE', $LOG_FILE);
@@ -9,6 +10,7 @@ $profile = null;
 $profiles = array();
 $_profiles = array(
     'webhook_url' => null,
+    'teams_webhook_url' => null,
     'default_channel' => null,
     'from_name' => null,
     'members' => array()
@@ -27,15 +29,18 @@ if (empty($profile)) {
 if (! empty($profile['webhook_url'])) {
     $CI_SLACK_WEBHOOK_URL = $profile['webhook_url'];
 }
-
-if (empty($CI_SLACK_WEBHOOK_URL)) {
-    log_append('Invalid Slack Webhook URL');
+if (! empty($profile['teams_webhook_url'])) {
+    $CI_TEAMS_WEBHOOK_URL = $profile['teams_webhook_url'];
+}
+if (empty($CI_SLACK_WEBHOOK_URL) && empty($CI_TEAMS_WEBHOOK_URL)) {
+    log_append('Invalid Webhook URL');
     die();
 }
 
-$CI_SLACK_MEMBERS = $profile['members'];
+$CI_MEMBERS = $profile['members'];
 define('CI_SLACK_WEBHOOK_URL', $CI_SLACK_WEBHOOK_URL);
-define('CI_SLACK_MEMBERS', $CI_SLACK_MEMBERS);
+define('CI_TEAMS_WEBHOOK_URL', $CI_TEAMS_WEBHOOK_URL);
+define('CI_MEMBERS', $CI_MEMBERS);
 
 function pr($var)
 {
@@ -64,6 +69,9 @@ function exec_command($command)
 
 function slack($message, $room = null, $username = null, $icon = ":bell:")
 {
+    if (! CI_SLACK_WEBHOOK_URL) {
+        return false;
+    }
     $attachments = array();
     if (is_array($message)) {
         $_message = '';
@@ -102,18 +110,95 @@ function slack($message, $room = null, $username = null, $icon = ":bell:")
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     $result = curl_exec($ch);
     curl_close($ch);
     return $result;
 }
 
+function teams($message, $to_name = null, $to_email = null)
+{
+    if (! CI_TEAMS_WEBHOOK_URL) {
+        return false;
+    }
+    if (is_null($to_name) || is_null($to_email)) {
+        $jsonData = array('text' => $message);
+    } else {
+        $jsonData = array(
+            "type" => "message",
+            "attachments" => array(
+                array(
+                    "contentType" => "application/vnd.microsoft.card.adaptive",
+                    "content" => array(
+                        "\$schema" => "http://adaptivecards.io/schemas/adaptive-card.json",
+                        "type" => "AdaptiveCard",
+                        "version" => "1.0",
+                        "body" => array(
+                            array(
+                                "type" => "TextBlock",
+                                "size" => "Medium",
+                                "weight" => "Bolder",
+                                "text" => "Message To <at>" . $to_name . "</at>:",
+                            ),
+                            array(
+                                "type" => "TextBlock",
+                                "text" => $message,
+                                "wrap" => true,
+                            )
+                        ),
+                        "msteams" => array(
+                            "entities" => array(
+                                array(
+                                    "type" => "mention",
+                                    "text" => "<at>" . $to_name . "</at>",
+                                    "mentioned" => array(
+                                        "id" => $to_email,
+                                        "name" => $to_name,
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        );
+    }
+    $jsonDataEncoded = json_encode($jsonData, true);
+    $header = array();
+    $header[] = 'Content-type: application/json';
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, CI_TEAMS_WEBHOOK_URL);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
+    curl_setopt($ch, CURLOPT_HEADER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    return $result;
+}
+
+function member($field, $search)
+{
+    $members = CI_MEMBERS;
+    foreach ($members as $key => $value) {
+        if (in_array($search, $value) && isset($value[$field])) {
+            return $value[$field];
+        }
+    }
+    return null;
+}
+
 function slack_user($search)
 {
-    $members = CI_SLACK_MEMBERS;
+    $members = CI_MEMBERS;
     foreach ($members as $key => $value) {
-        if (in_array($search, $value)) {
-            return '@' . $key;
+        if (in_array($search, $value) && isset($value['slackid'])) {
+            return '@' . $value['slackid'];
         }
     }
     return null;
@@ -150,3 +235,11 @@ $res = slack($msg, $to, $profile['from_name']);
 if ($res != 'ok') {
     log_append("${msg} - ${res}");
 }
+// TEAMS
+$teams_to_name = null;
+$teams_to_email = null;
+if (isset($_REQUEST['to_user']) && ! empty($_REQUEST['to_user'])) {
+    $teams_to_name = member('name', $_REQUEST['to_user']);
+    $teams_to_email = member('teamsid', $_REQUEST['to_user']);
+}
+teams($msg);
