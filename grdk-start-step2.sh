@@ -230,4 +230,27 @@ else
 	docker stack deploy --compose-file  ./vendor/grdk-core/services/backup/docker-stack.yml grdk-backup
 fi
 
+### GRDK-MONITOR-BUILD
+set +e
+grdk_qbuild_img grdk-node-exporter
+ret_b=$?
+set -e
+if [ $ret_b = 1 ]; then
+	echo "GRDK-MONITOR - RUN BUILD"
+	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-node-exporter:latest -f ./vendor/grdk-core/services/monitor/node-exporter/Dockerfile ./vendor/grdk-core/services/monitor/node-exporter/
+	echo "GRDK-MONITOR - PUSH -> REPO-DI"
+	docker push ${DK_REPO_DI_HOST}:5000/grdk-node-exporter:latest
+else
+	echo "GRDK-MONITOR - BUILD skiped"
+fi
+
+### GRDK-MONITOR-DEPLOY
+SERVICES=$(docker service ls -q -f name=grdk-monitor_prometheus | wc -l)
+if [[ "$SERVICES" -gt 0 ]]; then
+	echo "GRDK-MONITOR - STACK DEPLOY skiped"
+else
+	echo "GRDK-MONITOR - RUN STACK DEPLOY"
+	docker stack deploy --compose-file  ./vendor/grdk-core/services/monitor/docker-stack.yml grdk-monitor
+fi
+
 echo "STEP2 - END"

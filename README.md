@@ -7,7 +7,7 @@ GRDKCore - Biblioteca principal dos serviços Docker
 * GRDKProxy (80, 8080 e 443)
 * GRDKRepo (8000 e 2200)
 * GRDKRepoDI (5000)
-* GRDKMonitor (8001)
+* GRDKMonitor (8001 / 9090, 9100 e 3000)
 * GRDKMsg (8002)
 * GRDKBackup
 
