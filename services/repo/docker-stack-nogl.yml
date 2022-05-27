@@ -8,7 +8,7 @@ volumes:
 
 services:
   di:
-    image: "registry:2"
+    image: "registry:2.8.1"
     volumes:
       - didata:/var/lib/registry
     environment:

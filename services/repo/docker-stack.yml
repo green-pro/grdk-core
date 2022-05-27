@@ -24,7 +24,7 @@ volumes:
 
 services:
   web:
-    image: "gitlab/gitlab-ce:10.8.5-ce.0"
+    image: "gitlab/gitlab-ce:10.8.7-ce.0"
     volumes:
       - glconf:/etc/gitlab
       - gllog:/var/log/gitlab
@@ -48,7 +48,7 @@ services:
         window: 120s
 
   runner-1:
-    image: "gitlab/gitlab-runner:v10.8.0"
+    image: "gitlab/gitlab-runner:v10.8.2"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - glr1conf:/etc/gitlab-runner
@@ -63,7 +63,7 @@ services:
         window: 60s
 
   di:
-    image: "registry:2"
+    image: "registry:2.8.1"
     volumes:
       - didata:/var/lib/registry
     environment:
