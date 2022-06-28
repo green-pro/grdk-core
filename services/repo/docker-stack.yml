@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.6"
 
 volumes:
   glconf:
@@ -30,6 +30,7 @@ services:
       - gllog:/var/log/gitlab
       - gldata:/var/opt/gitlab
     hostname: '{{ DK_REPO_HOST }}'
+    shm_size: '256m'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
         external_url 'http://{{ DK_REPO_HOST }}:8000'
