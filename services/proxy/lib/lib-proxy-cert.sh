@@ -76,3 +76,15 @@ _proxy_cert_renew()
 		--deploy-hook 'echo $RENEWED_DOMAINS >> /etc/letsencrypt/deploy_hook_renewed.txt'
 	return 0
 }
+
+_proxy_cert_updatesl()
+{
+	# RUN
+	echo "List all certificates"
+	docker run -it --rm --name grdk-proxy_certbot \
+		-v "/mnt/storage-local/grdk-proxy/certboot/etc:/etc/letsencrypt" \
+		-v "/mnt/storage-local/grdk-proxy/certboot/lib:/var/lib/letsencrypt" \
+		-v "/mnt/storage-local/grdk-proxy/certboot/www:/var/www/acme" \
+		${DK_REPO_DI_HOST}:5000/certbot/certbot:v0.40.1 update_symlinks
+	return 0
+}
