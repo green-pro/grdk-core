@@ -8,7 +8,7 @@ echo "Searching..."
 dimgs=()
 for dfile in `find ./vendor/grdk-core/services -type f -name docker\-*.yml`
 do
-	for dimg in `cat $dfile | awk "/^[[:space:]]*image\:[[:space:]]*\"[a-z\/\-]+\:[a-z0-9\.\-]*\"$/{print}" | awk '/image\:/{print $2}' | sed 's/"//g'`
+	for dimg in `cat $dfile | awk "/^[[:space:]]*image:[[:space:]]*\"[a-z\/\-]+:[a-z0-9\.\-]*\"$/{print}" | awk '/image:/{print $2}' | sed 's/"//g'`
 	do
 		n=${#dimgs[@]}
 		echo "$(($n + 1)). ${dimg}"

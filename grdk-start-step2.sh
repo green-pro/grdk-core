@@ -18,6 +18,10 @@ else
 fi
 set -e
 
+### PAUSA
+echo "Aguardando..."
+sleep 5s
+
 ### AUTOIMPORT IMAGES
 echo "AUTOIMPORT IMAGES"
 for entry in "./vendor/grdk-core/services"/*
@@ -206,28 +210,30 @@ else
 	echo "GRDK-PROXY - START/UP skiped"
 fi
 
-### GRDK-BACKUP-BUILD
-set +e
-grdk_qbuild_img grdk-backup
-ret_b=$?
-set -e
-if [ $ret_b = 1 ]; then
-	echo "GRDK-BACKUP - RUN BUILD"
-	cp ./src/services/backup/dblist.conf ./vendor/grdk-core/services/backup/scripts/
-	docker build -t ${DK_REPO_DI_HOST}:5000/grdk-backup:latest -f ./vendor/grdk-core/services/backup/Dockerfile ./vendor/grdk-core/services/backup/
-	echo "GRDK-BACKUP - PUSH -> REPO-DI"
-	docker push ${DK_REPO_DI_HOST}:5000/grdk-backup:latest
-else
-	echo "GRDK-BACKUP - BUILD skiped"
-fi
-
-### GRDK-BACKUP-DEPLOY
-SERVICES=$(docker service ls -q -f name=grdk-backup_cron | wc -l)
-if [[ "$SERVICES" -gt 0 ]]; then
-	echo "GRDK-BACKUP - STACK DEPLOY skiped"
-else
-	echo "GRDK-BACKUP - RUN STACK DEPLOY"
-	docker stack deploy --compose-file  ./vendor/grdk-core/services/backup/docker-stack.yml grdk-backup
+### GRDK-BACKUP
+if [ "$DK_BK_INST" = "Y" ]; then
+	### BUILD
+	set +e
+	grdk_qbuild_img grdk-backup
+	ret_b=$?
+	set -e
+	if [ $ret_b = 1 ]; then
+		echo "GRDK-BACKUP - RUN BUILD"
+		cp ./src/services/backup/dblist.conf ./vendor/grdk-core/services/backup/scripts/
+		docker build -t ${DK_REPO_DI_HOST}:5000/grdk-backup:latest -f ./vendor/grdk-core/services/backup/Dockerfile ./vendor/grdk-core/services/backup/
+		echo "GRDK-BACKUP - PUSH -> REPO-DI"
+		docker push ${DK_REPO_DI_HOST}:5000/grdk-backup:latest
+	else
+		echo "GRDK-BACKUP - BUILD skiped"
+	fi
+	### DEPLOY
+	SERVICES=$(docker service ls -q -f name=grdk-backup_cron | wc -l)
+	if [[ "$SERVICES" -gt 0 ]]; then
+		echo "GRDK-BACKUP - STACK DEPLOY skiped"
+	else
+		echo "GRDK-BACKUP - RUN STACK DEPLOY"
+		docker stack deploy --compose-file  ./vendor/grdk-core/services/backup/docker-stack.yml grdk-backup
+	fi
 fi
 
 ### GRDK-MONITOR-BUILD

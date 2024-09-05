@@ -1,6 +1,7 @@
 FROM alpine:3.9
 
 ARG MYDUMPER_VERSION=0.9.5
+ARG AWSCLI_VERSION=1.16.161
 
 ENV PACKAGES="mysql-client" \
     LIB_PACKAGES="glib-dev mysql-dev zlib-dev pcre-dev libressl-dev ca-certificates openssl python2 bash curl rsync" \
@@ -21,7 +22,7 @@ RUN apk --no-cache add \
     make && \
     mv ./mydumper /usr/bin/. && \
     mv ./myloader /usr/bin/. && \
-    pip install awscli && \
+    pip install awscli==$AWSCLI_VERSION && \
     cd / && rm -rf $BUILD_PATH && \
     apk del $BUILD_PACKAGES && \
     rm -f /usr/lib/*.a && \
