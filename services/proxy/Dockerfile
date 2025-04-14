@@ -1,4 +1,4 @@
-FROM nginx:1.13.5-alpine
+FROM nginx:1.13.12-alpine
 
 COPY nginx.conf /etc/nginx/
 COPY acme-loc.inc /etc/nginx/conf.d/
