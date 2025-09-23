@@ -1,0 +1,168 @@
+version: '3.8'
+
+volumes:
+  n8n_data:
+    driver: nfs
+    driver_opts:
+      share: "storage-2.geo:storage_n8n/n8n_data"
+  pg_data:
+    driver: nfs
+    driver_opts:
+      share: "storage-2.geo:storage_n8n/pg_data"
+  redis_data:
+    driver: nfs
+    driver_opts:
+      share: "storage-2.geo:storage_n8n/redis_data"
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=n8n
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=559b31ed777c
+      - TZ=America/Sao_Paulo
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    # Para proteger o Redis com senha, defina a command abaixo e exporte a mesma senha nos serviços n8n
+    # command: ["redis-server", "--appendonly", "yes", "--requirepass", "change_me_redis_P@sS"]
+    volumes:
+      - redis_data:/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  n8n-web:
+    image: n8nio/n8n:1.109.1
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - TZ=America/Sao_Paulo
+
+      # URLs públicas
+      - N8N_HOST=n8n.geometrus.com.br
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n.geometrus.com.br/
+      - N8N_EDITOR_BASE_URL=https://n8n.geometrus.com.br/
+      - N8N_PUBLIC_API_BASE_URL=https://n8n.geometrus.com.br/
+
+      # Autenticação básica
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=16bac35fa6bd
+
+      # Criptografia das credenciais (mantenha segura e permanente!)
+      - N8N_ENCRYPTION_KEY=1be9912c6268427aa514251a7212879b
+
+      # Banco (Postgres)
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=559b31ed777c
+
+      # Modo fila e sem execução de jobs neste serviço
+      - EXECUTIONS_MODE=queue
+
+      # Bull/Redis
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - QUEUE_BULL_REDIS_DB=0
+      # - QUEUE_BULL_REDIS_PASSWORD=change_me_redis_P@sS
+
+      # Evita que o main processe jobs (somente UI/Webhooks)
+      - N8N_DISABLE_PRODUCTION_MAIN_PROCESS=true
+
+    volumes:
+      - n8n_data:/home/node/.n8n
+    ports:
+      - "5678:5678"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  n8n-webhook:
+    image: n8nio/n8n:1.109.1
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - TZ=America/Sao_Paulo
+
+      - N8N_HOST=webhook.n8n.geometrus.com.br
+      - N8N_PORT=5679
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://webhook.n8n.geometrus.com.br/
+
+      # Banco (Postgres)
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=559b31ed777c
+
+      # Fila (Redis)
+      - EXECUTIONS_MODE=queue
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - QUEUE_BULL_REDIS_DB=0
+      # - QUEUE_BULL_REDIS_PASSWORD=change_me_redis_P@sS
+
+      # Rodar SOMENTE o servidor de webhooks
+      - N8N_RUN_WEBHOOK=true
+
+      # Mesma key de criptografia
+      - N8N_ENCRYPTION_KEY=1be9912c6268427aa514251a7212879b
+
+    ports:
+      - "5679:5679"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  n8n-worker:
+    image: n8nio/n8n:1.109.1
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - TZ=America/Sao_Paulo
+
+      # Banco
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=559b31ed777c
+
+      # Fila
+      - EXECUTIONS_MODE=queue
+      - QUEUE_BULL_REDIS_HOST=redis
+      - QUEUE_BULL_REDIS_PORT=6379
+      - QUEUE_BULL_REDIS_DB=0
+      # - QUEUE_BULL_REDIS_PASSWORD=change_me_redis_P@sS
+
+      # Somente worker
+      - N8N_RUN_WORKER=true
+
+      # Mesma key de criptografia
+      - N8N_ENCRYPTION_KEY=1be9912c6268427aa514251a7212879b
+
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
