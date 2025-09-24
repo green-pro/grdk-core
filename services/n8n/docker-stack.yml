@@ -70,7 +70,7 @@ services:
 
 
   n8n-web:
-    image: n8nio/n8n:1.109.1
+    image: n8nio/n8n:1.112.5
     depends_on:
       - postgres
       - redis
@@ -134,7 +134,7 @@ services:
         condition: on-failure
 
   n8n-webhook:
-    image: n8nio/n8n:1.109.1
+    image: n8nio/n8n:1.112.5
     depends_on:
       - postgres
       - redis
@@ -175,7 +175,7 @@ services:
     ports:
       - "5679:5679"
     deploy:
-      replicas: 1
+      replicas: 2
       placement:
         constraints:
           - node.hostname == mustang
@@ -183,7 +183,7 @@ services:
         condition: on-failure
 
   n8n-worker:
-    image: n8nio/n8n:1.109.1
+    image: n8nio/n8n:1.112.5
     command: ["worker", "--concurrency=5"]
     depends_on:
       - postgres
