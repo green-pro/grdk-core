@@ -37,6 +37,12 @@ DK_AWS_SECRET_ACCESS_KEY=""
 DK_AWS_BUCKET=""
 DK_SWARM_IP="192.168.0.1"
 DK_SWARM_TOKEN="secret"
+DK_N8N_INST="n"
+DK_N8N_HOST="n8n.domain"
+DK_N8N_NFS_HOST="storage-1.domain"
+DK_N8N_NFS_PATH="/mnt/storage-n8n"
+DK_N8N_ENCRYPTION_KEY="secret"
+DK_N8N_POSTGRES_PASSWORD="secret"
 
 if [ -f "./environment.sh" ]; then
 	source ./environment.sh
@@ -111,6 +117,20 @@ if [ "$DK_INSTALL_TYPE" = "M" ]; then
 		read -p "[AWS] - Informe o AWS_BUCKET: [${DK_AWS_BUCKET}] " -e answer
 		DK_AWS_BUCKET=${answer:-${DK_AWS_BUCKET}}
 	fi
+	read -p "[N8N] - Utilizar N8N? (Y/n) [${DK_N8N_INST}] " -e answer
+	DK_N8N_INST=${answer:-${DK_N8N_INST}}
+	if [ "$DK_N8N_INST" = "Y" ]; then
+		read -p "[N8N] - Informe o host do N8N: [${DK_N8N_HOST}] " -e answer
+		DK_N8N_HOST=${answer:-${DK_N8N_HOST}}
+		read -p "[N8N] - Informe o host do servidor NFS: [${DK_N8N_NFS_HOST}] " -e answer
+		DK_N8N_NFS_HOST=${answer:-${DK_N8N_NFS_HOST}}
+		read -p "[N8N] - Informe o diretório do servidor NFS: [${DK_N8N_NFS_PATH}] " -e answer
+		DK_N8N_NFS_PATH=${answer:-${DK_N8N_NFS_PATH}}
+		read -p "[N8N] - Informe a chave de criptografia: [${DK_N8N_ENCRYPTION_KEY}] " -e answer
+		DK_N8N_ENCRYPTION_KEY=${answer:-${DK_N8N_ENCRYPTION_KEY}}
+		read -p "[N8N] - Informe a senha do DB Postgres: [${DK_N8N_POSTGRES_PASSWORD}] " -e answer
+		DK_N8N_POSTGRES_PASSWORD=${answer:-${DK_N8N_POSTGRES_PASSWORD}}
+	fi
 
 	cat > ./environment.sh << EOF
 #!/bin/bash
@@ -135,6 +155,12 @@ export DK_BK_INST="${DK_BK_INST}"
 export DK_AWS_ACCESS_KEY_ID="${DK_AWS_ACCESS_KEY_ID}"
 export DK_AWS_SECRET_ACCESS_KEY="${DK_AWS_SECRET_ACCESS_KEY}"
 export DK_AWS_BUCKET="${DK_AWS_BUCKET}"
+export DK_N8N_INST="${DK_N8N_INST}"
+export DK_N8N_HOST="${DK_N8N_HOST}"
+export DK_N8N_NFS_HOST="${DK_N8N_NFS_HOST}"
+export DK_N8N_NFS_PATH="${DK_N8N_NFS_PATH}"
+export DK_N8N_ENCRYPTION_KEY="${DK_N8N_ENCRYPTION_KEY}"
+export DK_N8N_POSTGRES_PASSWORD="${DK_N8N_POSTGRES_PASSWORD}"
 EOF
 
 elif [ "$DK_INSTALL_TYPE" = "w" ]; then

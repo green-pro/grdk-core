@@ -259,4 +259,16 @@ else
 	docker stack deploy --compose-file  ./vendor/grdk-core/services/monitor/docker-stack.yml grdk-monitor
 fi
 
+### GRDK-N8N
+if [ "$DK_N8N_INST" = "Y" ]; then
+	### DEPLOY
+	SERVICES=$(docker service ls -q -f name=grdk-n8n_ | wc -l)
+	if [[ "$SERVICES" -gt 0 ]]; then
+		echo "GRDK-N8N - STACK DEPLOY skiped"
+	else
+		echo "GRDK-N8N - RUN STACK DEPLOY"
+		docker stack deploy --compose-file  ./build/services/n8n/_docker-stack.yml grdk-n8n
+	fi
+fi
+
 echo "STEP2 - END"

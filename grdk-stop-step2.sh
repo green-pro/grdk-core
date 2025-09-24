@@ -2,6 +2,15 @@
 
 echo "STEP2 - START"
 
+### GRDK-N8N
+SERVICES=$(docker service ls -q -f name=grdk-n8n_ | wc -l)
+if [[ "$SERVICES" -gt 0 ]]; then
+	echo "GRDK-N8N - STACK REMOVED"
+	docker stack rm grdk-n8n
+else
+	echo "GRDK-N8N - STACK REMOVE skiped"
+fi
+
 ### GRDK-BACKUP
 SERVICES=$(docker service ls -q -f name=grdk-backup_cron | wc -l)
 if [[ "$SERVICES" -gt 0 ]]; then

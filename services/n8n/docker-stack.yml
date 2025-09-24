@@ -4,15 +4,15 @@ volumes:
   n8n_data:
     driver: nfs
     driver_opts:
-      share: "storage-2.geo:/storage/storage_n8n/n8n_data"
+      share: "{{ DK_N8N_NFS_HOST }}:{{ DK_N8N_NFS_PATH }}/n8n_data"
   pg_data:
     driver: nfs
     driver_opts:
-      share: "storage-2.geo:/storage/storage_n8n/pg_data"
+      share: "{{ DK_N8N_NFS_HOST }}:{{ DK_N8N_NFS_PATH }}/pg_data"
   redis_data:
     driver: nfs
     driver_opts:
-      share: "storage-2.geo:/storage/storage_n8n/redis_data"
+      share: "{{ DK_N8N_NFS_HOST }}:{{ DK_N8N_NFS_PATH }}/redis_data"
 
 services:
   postgres:
@@ -20,7 +20,7 @@ services:
     environment:
       - POSTGRES_DB=n8n
       - POSTGRES_USER=n8n
-      - POSTGRES_PASSWORD=559b31ed777c
+      - POSTGRES_PASSWORD={{ DK_N8N_POSTGRES_PASSWORD }}
       - TZ=America/Sao_Paulo
     volumes:
       - pg_data:/var/lib/postgresql/data
@@ -79,15 +79,15 @@ services:
       # - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
 
       # URLs públicas
-      - N8N_HOST=n8n.geometrus.com.br
+      - N8N_HOST={{ DK_N8N_HOST }}
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - N8N_PROXY_HOPS=1
       # - N8N_SECURE_COOKIE=true
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      - WEBHOOK_URL=https://webhook.n8n.geometrus.com.br/
-      - N8N_EDITOR_BASE_URL=https://n8n.geometrus.com.br/
-      - N8N_PUBLIC_API_BASE_URL=https://n8n.geometrus.com.br/
+      - WEBHOOK_URL=https://webhook.{{ DK_N8N_HOST }}/
+      - N8N_EDITOR_BASE_URL=https://{{ DK_N8N_HOST }}/
+      - N8N_PUBLIC_API_BASE_URL=https://{{ DK_N8N_HOST }}/
 
       # Autenticação básica
       - N8N_BASIC_AUTH_ACTIVE=true
@@ -95,7 +95,7 @@ services:
       - N8N_BASIC_AUTH_PASSWORD=16bac35fa6bd
 
       # Criptografia das credenciais (mantenha segura e permanente!)
-      - N8N_ENCRYPTION_KEY=1be9912c6268427aa514251a7212879b
+      - N8N_ENCRYPTION_KEY={{ DK_N8N_ENCRYPTION_KEY }}
 
       # Banco (Postgres)
       - DB_TYPE=postgresdb
@@ -103,7 +103,7 @@ services:
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_USER=n8n
-      - DB_POSTGRESDB_PASSWORD=559b31ed777c
+      - DB_POSTGRESDB_PASSWORD={{ DK_N8N_POSTGRES_PASSWORD }}
 
       # Modo fila e sem execução de jobs neste serviço
       - EXECUTIONS_MODE=queue
@@ -141,12 +141,12 @@ services:
     environment:
       - TZ=America/Sao_Paulo
 
-      - N8N_HOST=webhook.n8n.geometrus.com.br
+      - N8N_HOST=webhook.{{ DK_N8N_HOST }}
       - N8N_PORT=5679
       - N8N_PROTOCOL=https
       - N8N_PROXY_HOPS=1
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      - WEBHOOK_URL=https://webhook.n8n.geometrus.com.br/
+      - WEBHOOK_URL=https://webhook.{{ DK_N8N_HOST }}/
 
       # Banco (Postgres)
       - DB_TYPE=postgresdb
@@ -154,7 +154,7 @@ services:
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_USER=n8n
-      - DB_POSTGRESDB_PASSWORD=559b31ed777c
+      - DB_POSTGRESDB_PASSWORD={{ DK_N8N_POSTGRES_PASSWORD }}
 
       # Fila (Redis)
       - EXECUTIONS_MODE=queue
@@ -167,7 +167,7 @@ services:
       - N8N_RUN_WEBHOOK=true
 
       # Mesma key de criptografia
-      - N8N_ENCRYPTION_KEY=1be9912c6268427aa514251a7212879b
+      - N8N_ENCRYPTION_KEY={{ DK_N8N_ENCRYPTION_KEY }}
 
       - N8N_RUNNERS_ENABLED=false
       - QUEUE_BULL_PREFIX=bull
@@ -199,7 +199,7 @@ services:
       - DB_POSTGRESDB_HOST=postgres
       - DB_POSTGRESDB_PORT=5432
       - DB_POSTGRESDB_USER=n8n
-      - DB_POSTGRESDB_PASSWORD=559b31ed777c
+      - DB_POSTGRESDB_PASSWORD={{ DK_N8N_POSTGRES_PASSWORD }}
 
       # Fila
       - EXECUTIONS_MODE=queue
@@ -212,7 +212,7 @@ services:
       - N8N_RUN_WORKER=true
 
       # Mesma key de criptografia
-      - N8N_ENCRYPTION_KEY=1be9912c6268427aa514251a7212879b
+      - N8N_ENCRYPTION_KEY={{ DK_N8N_ENCRYPTION_KEY }}
 
       - N8N_RUNNERS_ENABLED=false
       - QUEUE_BULL_PREFIX=bull
