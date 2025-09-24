@@ -34,12 +34,12 @@ do
 		mkdir -p $srv_build_path
 		if [ -f "${entry}/docker-stack.yml" ]; then
 			echo "Building: ${entry}/docker-stack.yml"
-			grdk_replace_vars $entry/docker-stack.yml $srv_build_path/_docker-stack.yml
+			grdk_replace_all_vars $entry/docker-stack.yml $srv_build_path/_docker-stack.yml
 			grdk_yaml2json $srv_build_path/_docker-stack.yml $srv_build_path/_docker-stack.json
 		fi
 		if [ -f "${entry}/docker-compose.yml" ]; then
 			echo "Building: ${entry}/docker-compose.yml"
-			grdk_replace_vars $entry/docker-compose.yml $srv_build_path/_docker-compose.yml
+			grdk_replace_all_vars $entry/docker-compose.yml $srv_build_path/_docker-compose.yml
 			grdk_yaml2json $srv_build_path/_docker-compose.yml $srv_build_path/_docker-compose.json
 		fi
 	fi
@@ -51,12 +51,12 @@ do
 		mkdir -p $srv_build_path
 		if [ -f "${entry}/docker-stack.yml" ]; then
 			echo "Building: ${entry}/docker-stack.yml"
-			grdk_replace_vars $entry/docker-stack.yml $srv_build_path/_docker-stack.yml
+			grdk_replace_all_vars $entry/docker-stack.yml $srv_build_path/_docker-stack.yml
 			grdk_yaml2json $srv_build_path/_docker-stack.yml $srv_build_path/_docker-stack.json
 		fi
 		if [ -f "${entry}/docker-compose.yml" ]; then
 			echo "Building: ${entry}/docker-compose.yml"
-			grdk_replace_vars $entry/docker-compose.yml $srv_build_path/_docker-compose.yml
+			grdk_replace_all_vars $entry/docker-compose.yml $srv_build_path/_docker-compose.yml
 			grdk_yaml2json $srv_build_path/_docker-compose.yml $srv_build_path/_docker-compose.json
 		fi
 	fi
