@@ -4,15 +4,15 @@ volumes:
   n8n_data:
     driver: nfs
     driver_opts:
-      share: "storage-2.geo:storage_n8n/n8n_data"
+      share: "storage-2.geo:/storage/storage_n8n/n8n_data"
   pg_data:
     driver: nfs
     driver_opts:
-      share: "storage-2.geo:storage_n8n/pg_data"
+      share: "storage-2.geo:/storage/storage_n8n/pg_data"
   redis_data:
     driver: nfs
     driver_opts:
-      share: "storage-2.geo:storage_n8n/redis_data"
+      share: "storage-2.geo:/storage/storage_n8n/redis_data"
 
 services:
   postgres:
@@ -25,6 +25,26 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     deploy:
+      placement:
+        constraints:
+          - node.hostname == mustang
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U n8n -d n8n -h 127.0.0.1 -p 5432 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  adminer:
+    image: adminer
+    ports:
+      - "8032:8080"
+    deploy:
+      placement:
+        constraints:
+          - node.hostname == mustang
       restart_policy:
         condition: on-failure
 
@@ -36,8 +56,18 @@ services:
     volumes:
       - redis_data:/data
     deploy:
+      placement:
+        constraints:
+          - node.hostname == mustang
       restart_policy:
         condition: on-failure
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
 
   n8n-web:
     image: n8nio/n8n:1.109.1
@@ -46,12 +76,16 @@ services:
       - redis
     environment:
       - TZ=America/Sao_Paulo
+      # - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
 
       # URLs públicas
       - N8N_HOST=n8n.geometrus.com.br
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
-      - WEBHOOK_URL=https://n8n.geometrus.com.br/
+      - N8N_PROXY_HOPS=1
+      # - N8N_SECURE_COOKIE=true
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - WEBHOOK_URL=https://webhook.n8n.geometrus.com.br/
       - N8N_EDITOR_BASE_URL=https://n8n.geometrus.com.br/
       - N8N_PUBLIC_API_BASE_URL=https://n8n.geometrus.com.br/
 
@@ -83,12 +117,19 @@ services:
       # Evita que o main processe jobs (somente UI/Webhooks)
       - N8N_DISABLE_PRODUCTION_MAIN_PROCESS=true
 
+      - OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS=true
+      - N8N_RUNNERS_ENABLED=false
+      - QUEUE_BULL_PREFIX=bull
+
     volumes:
       - n8n_data:/home/node/.n8n
     ports:
       - "5678:5678"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.hostname == mustang
       restart_policy:
         condition: on-failure
 
@@ -103,6 +144,8 @@ services:
       - N8N_HOST=webhook.n8n.geometrus.com.br
       - N8N_PORT=5679
       - N8N_PROTOCOL=https
+      - N8N_PROXY_HOPS=1
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - WEBHOOK_URL=https://webhook.n8n.geometrus.com.br/
 
       # Banco (Postgres)
@@ -126,20 +169,29 @@ services:
       # Mesma key de criptografia
       - N8N_ENCRYPTION_KEY=1be9912c6268427aa514251a7212879b
 
+      - N8N_RUNNERS_ENABLED=false
+      - QUEUE_BULL_PREFIX=bull
+
     ports:
       - "5679:5679"
     deploy:
       replicas: 1
+      placement:
+        constraints:
+          - node.hostname == mustang
       restart_policy:
         condition: on-failure
 
   n8n-worker:
     image: n8nio/n8n:1.109.1
+    command: ["worker", "--concurrency=5"]
     depends_on:
       - postgres
       - redis
     environment:
       - TZ=America/Sao_Paulo
+
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
 
       # Banco
       - DB_TYPE=postgresdb
@@ -162,7 +214,13 @@ services:
       # Mesma key de criptografia
       - N8N_ENCRYPTION_KEY=1be9912c6268427aa514251a7212879b
 
+      - N8N_RUNNERS_ENABLED=false
+      - QUEUE_BULL_PREFIX=bull
+
     deploy:
       replicas: 2
+      placement:
+        constraints:
+          - node.hostname == mustang
       restart_policy:
         condition: on-failure
