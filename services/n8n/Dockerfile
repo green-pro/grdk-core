@@ -1,4 +1,7 @@
 FROM n8nio/n8n:1.112.5
+USER root
+RUN mkdir -p /home/node/.n8n/nodes /home/node/.npm \
+    && chown -R node:node /home/node
 USER node
 WORKDIR /home/node/.n8n/nodes
 RUN test -f package.json || npm init -y \
