@@ -75,7 +75,7 @@ services:
       start_period: 300s
 
   n8n-web:
-    image: n8nio/n8n:1.112.5
+    image: "${DK_REPO_DI_HOST}:5000/grdk-n8n:latest"
     depends_on:
       - postgres
       - redis
@@ -116,6 +116,13 @@ services:
       - QUEUE_BULL_REDIS_DB=0
       # - QUEUE_BULL_REDIS_PASSWORD=change_me_redis_P@sS
 
+      # Packages
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_COMMUNITY_PACKAGES_PREVENT_LOADING=false
+      - N8N_REINSTALL_MISSING_PACKAGES=true
+      - N8N_VERIFIED_PACKAGES_ENABLED=false
+      - N8N_UNVERIFIED_PACKAGES_ENABLED=false
+
     volumes:
       - n8n_data:/home/node/.n8n
       - n8n_files:/files
@@ -130,7 +137,8 @@ services:
         condition: on-failure
 
   n8n-webhook:
-    image: n8nio/n8n:1.112.5
+    image: "${DK_REPO_DI_HOST}:5000/grdk-n8n:latest"
+    command: ["webhook"]
     depends_on:
       - postgres
       - redis
@@ -151,6 +159,7 @@ services:
 
       # Modo Webhook
       - N8N_RUN_WEBHOOK=true
+      - N8N_DISABLE_PRODUCTION_MAIN_PROCESS=true
 
       # Banco (Postgres)
       - DB_TYPE=postgresdb
@@ -167,6 +176,13 @@ services:
       - QUEUE_BULL_REDIS_DB=0
       # - QUEUE_BULL_REDIS_PASSWORD=change_me_redis_P@sS
 
+      # Packages
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_COMMUNITY_PACKAGES_PREVENT_LOADING=false
+      - N8N_REINSTALL_MISSING_PACKAGES=true
+      - N8N_VERIFIED_PACKAGES_ENABLED=false
+      - N8N_UNVERIFIED_PACKAGES_ENABLED=false
+
     ports:
       - "5679:5679"
     deploy:
@@ -178,7 +194,7 @@ services:
         condition: on-failure
 
   n8n-worker:
-    image: n8nio/n8n:1.112.5
+    image: "${DK_REPO_DI_HOST}:5000/grdk-n8n:latest"
     command: ["worker", "--concurrency=5"]
     depends_on:
       - postgres
@@ -209,6 +225,13 @@ services:
       - QUEUE_BULL_REDIS_PORT=6379
       - QUEUE_BULL_REDIS_DB=0
       # - QUEUE_BULL_REDIS_PASSWORD=change_me_redis_P@sS
+
+      # Packages
+      - N8N_COMMUNITY_PACKAGES_ENABLED=true
+      - N8N_COMMUNITY_PACKAGES_PREVENT_LOADING=false
+      - N8N_REINSTALL_MISSING_PACKAGES=true
+      - N8N_VERIFIED_PACKAGES_ENABLED=false
+      - N8N_UNVERIFIED_PACKAGES_ENABLED=false
 
     deploy:
       replicas: 2

@@ -261,6 +261,19 @@ fi
 
 ### GRDK-N8N
 if [ "$DK_N8N_INST" = "Y" ]; then
+	### BUILD
+	set +e
+	grdk_qbuild_img grdk-n8n
+	ret_b=$?
+	set -e
+	if [ $ret_b = 1 ]; then
+		echo "GRDK-N8N - RUN BUILD"
+		docker build -t ${DK_REPO_DI_HOST}:5000/grdk-n8n:latest -f ./vendor/grdk-core/services/n8n/Dockerfile ./vendor/grdk-core/services/n8n/
+		echo "GRDK-N8N - PUSH -> REPO-DI"
+		docker push ${DK_REPO_DI_HOST}:5000/grdk-n8n:latest
+	else
+		echo "GRDK-N8N - BUILD skiped"
+	fi
 	### DEPLOY
 	SERVICES=$(docker service ls -q -f name=grdk-n8n_ | wc -l)
 	if [[ "$SERVICES" -gt 0 ]]; then
