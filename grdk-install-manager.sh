@@ -58,23 +58,6 @@ else
 	echo "{\"dns\":[\"${DK_SERVER_DNS}\"],\"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"]}" > /etc/docker/daemon.json
 fi
 
-### DOCKER-COMPOSE
-if command_exists docker-compose; then
-	echo "Docker Composer already installed"
-else
-	curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-	chmod +x /usr/local/bin/docker-compose
-fi
-
-### DOCKER-VOLUME-NETSHARE
-if command_exists docker-volume-netshare; then
-	echo "Docker Volume Netshare already installed"
-else
-	wget https://github.com/ContainX/docker-volume-netshare/releases/download/v0.34/docker-volume-netshare_0.34_amd64.deb
-	dpkg -i docker-volume-netshare_0.34_amd64.deb
-	rm docker-volume-netshare_0.34_amd64.deb
-fi
-
 ### SERVICES UP
 if [[ ! `ps ax | grep dockerd | grep -v grep` ]]; then
 	service docker start
@@ -91,19 +74,6 @@ else
 	fi
 fi
 
-if [[ ! `ps ax | grep docker-volume-netshare | grep -v grep` ]]; then
-	service docker-volume-netshare start
-	sleep 10
-	echo "Service Docker NetShare started"
-else
-	echo "Service Docker NetShare already started"
-fi
-
-if [[ `service --status-all | grep 'docker-volume-netshare'` ]]; then
-	update-rc.d docker-volume-netshare defaults
-	echo "Service Docker NetShare set autoload"
-fi
-
 if [ "${DK_SERVER_INST_NFS}" = "Y" ]; then
 	service nfs-kernel-server restart
 	echo "NFS restarted"
@@ -113,7 +83,7 @@ fi
 set +e; docker node ls 2> /dev/null | grep "Leader"
 if [ $? -ne 0 ]; then
 	#docker swarm init > /dev/null 2>&1
-	docker swarm init --advertise-addr ${DK_SERVER_IP}
+	docker swarm init --advertise-addr ${DK_SERVER_IP} --default-addr-pool 10.0.0.0/8 --default-addr-pool-mask-length 20
 	echo "SWARM INIT OK"
 fi
 set -e
@@ -162,7 +132,6 @@ do
 done
 
 ### GRDK BIN
-
 if [ -f "/usr/local/bin/grdk" ]; then
 	echo "Scripts bin grdk deleted"
 	rm /usr/local/bin/grdk
