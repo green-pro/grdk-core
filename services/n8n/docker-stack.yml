@@ -43,17 +43,6 @@ services:
       retries: 5
       start_period: 300s
 
-  adminer:
-    image: adminer
-    ports:
-      - "8032:8080"
-    deploy:
-      placement:
-        constraints:
-          - node.hostname == mustang
-      restart_policy:
-        condition: on-failure
-
   redis:
     image: redis:7-alpine
     command: ["redis-server", "--appendonly", "yes"]
@@ -87,7 +76,7 @@ services:
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - N8N_EDITOR_BASE_URL=https://{{ DK_N8N_HOST }}/
-      - N8N_PUBLIC_API_BASE_URL=https://{{ DK_N8N_HOST }}/
+      # - N8N_PUBLIC_API_BASE_URL=https://{{ DK_N8N_HOST }}/
       - WEBHOOK_URL=https://webhook.{{ DK_N8N_HOST }}/
 
       # - N8N_SECURE_COOKIE=true
@@ -101,7 +90,7 @@ services:
       - N8N_BLOCK_ENV_ACCESS_IN_NODE=true
 
       # Modo UI
-      - N8N_DISABLE_PRODUCTION_MAIN_PROCESS=true
+      - N8N_DISABLE_PRODUCTION_MAIN_PROCESS=false
 
       # Banco (Postgres)
       - DB_TYPE=postgresdb
@@ -218,6 +207,7 @@ services:
 
       # Modo Worker
       - N8N_RUN_WORKER=true
+      - N8N_DISABLE_PRODUCTION_MAIN_PROCESS=true
 
       # Banco (Postgres)
       - DB_TYPE=postgresdb
