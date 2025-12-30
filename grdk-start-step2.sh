@@ -164,18 +164,7 @@ if [ "$DK_REPO_INST_GL" = "Y" ]; then
 fi
 
 ### GRDK-LOGGER (GRAYLOG)
-SERVICES=$(docker service ls -q -f name=grdk-logger_server | wc -l)
-if [[ "$SERVICES" -gt 0 ]]; then
-    echo "GRDK-LOGGER - STACK DEPLOY skiped"
-else
-    echo "TODO TODO TODO - GRDK-LOGGER - RUN STACK DEPLOY"
-    echo "INICIAR LOGGER MANUALMENTE COM docker-compose up -d no 239"
-#    docker stack deploy --compose-file ./logger/docker-stack.yml grdk-logger
-fi
-
-### PAUSA
-echo "Aguardando..."
-sleep 5s
+# TODO GeoLogger
 
 ### GRDK-PROXY-BUILD (NGINX)
 set +e
