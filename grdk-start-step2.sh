@@ -164,7 +164,7 @@ if [ "$DK_REPO_INST_GL" = "Y" ]; then
 fi
 
 ### GRDK-LOGGER (GRAYLOG)
-# TODO GeoLogger
+# TODO GRDK-LOGGER
 
 ### GRDK-PROXY-BUILD (NGINX)
 set +e
