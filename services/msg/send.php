@@ -123,7 +123,32 @@ function teams($message, $to_name = null, $to_email = null)
         return false;
     }
     if (is_null($to_name) || is_null($to_email)) {
-        $jsonData = array('text' => $message);
+        $jsonData = array(
+            "type" => "message",
+            "attachments" => array(
+                array(
+                    "contentType" => "application/vnd.microsoft.card.adaptive",
+                    "content" => array(
+                        "\$schema" => "http://adaptivecards.io/schemas/adaptive-card.json",
+                        "type" => "AdaptiveCard",
+                        "version" => "1.4",
+                        "body" => array(
+                            array(
+                                "type" => "TextBlock",
+                                "size" => "Medium",
+                                "weight" => "Bolder",
+                                "text" => "Message To ALL:",
+                            ),
+                            array(
+                                "type" => "TextBlock",
+                                "text" => $message,
+                                "wrap" => true,
+                            )
+                        )
+                    )
+                )
+            )
+        );
     } else {
         $jsonData = array(
             "type" => "message",
@@ -133,7 +158,7 @@ function teams($message, $to_name = null, $to_email = null)
                     "content" => array(
                         "\$schema" => "http://adaptivecards.io/schemas/adaptive-card.json",
                         "type" => "AdaptiveCard",
-                        "version" => "1.0",
+                        "version" => "1.4",
                         "body" => array(
                             array(
                                 "type" => "TextBlock",
