@@ -190,7 +190,7 @@ if [ ! "$(docker ps -q -f name=grdk-proxy)" ]; then
 		docker start grdk-proxy
 	else
 		echo "GRDK-PROXY - UP"
-		docker-compose -f ./build/services/proxy/_docker-compose.yml up -d
+		docker compose -f ./build/services/proxy/_docker-compose.yml up -d
 		sleep 5s
 		echo "GRDK-PROXY - start-servers.sh"
 		docker exec -it grdk-proxy start-servers.sh
