@@ -2,9 +2,11 @@ version: "3.6"
 
 volumes:
   didata:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/didata"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_REPO_NFS_HOST }},rw"
+        device: ":{{ DK_REPO_NFS_PATH }}/didata"
 
 services:
   di:

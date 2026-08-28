@@ -2,21 +2,29 @@ version: '3.8'
 
 volumes:
   n8n_data:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_N8N_NFS_HOST }}:{{ DK_N8N_NFS_PATH }}/n8n_data"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_N8N_NFS_HOST }},rw"
+        device: ":{{ DK_N8N_NFS_PATH }}/n8n_data"
   n8n_files:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_N8N_NFS_HOST }}:{{ DK_N8N_NFS_PATH }}/n8n_files"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_N8N_NFS_HOST }},rw"
+        device: ":{{ DK_N8N_NFS_PATH }}/n8n_files"
   pg_data:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_N8N_NFS_HOST }}:{{ DK_N8N_NFS_PATH }}/pg_data"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_N8N_NFS_HOST }},rw"
+        device: ":{{ DK_N8N_NFS_PATH }}/pg_data"
   redis_data:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_N8N_NFS_HOST }}:{{ DK_N8N_NFS_PATH }}/redis_data"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_N8N_NFS_HOST }},rw"
+        device: ":{{ DK_N8N_NFS_PATH }}/redis_data"
 
 services:
   postgres:

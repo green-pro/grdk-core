@@ -10,7 +10,7 @@ if command_exists docker; then
 	echo $(docker -v | cut -d ' ' -f3 | cut -d ',' -f1)
 else
 	curl -sSL https://get.docker.com | VERSION=$DK_DOCKER_VERSION sh
-	echo "{\"dns\":[\"${DK_SERVER_DNS}\"],\"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"]}" > /etc/docker/daemon.json
+	echo "{\"dns\":[\"${DK_SERVER_DNS}\"],\"insecure-registries\":[\"${DK_REPO_DI_HOST}:5000\"],\"default-ulimits\":{\"nofile\":{\"Name\":\"nofile\",\"Hard\":1048576,\"Soft\":1048576}}}" > /etc/docker/daemon.json
 fi
 
 ### SERVICES UP

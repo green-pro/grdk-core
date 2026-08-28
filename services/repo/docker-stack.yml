@@ -2,25 +2,35 @@ version: "3.6"
 
 volumes:
   glconf:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/glconf"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_REPO_NFS_HOST }},rw"
+        device: ":{{ DK_REPO_NFS_PATH }}/glconf"
   gllog:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/gllog"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_REPO_NFS_HOST }},rw"
+        device: ":{{ DK_REPO_NFS_PATH }}/gllog"
   gldata:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/gldata"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_REPO_NFS_HOST }},rw"
+        device: ":{{ DK_REPO_NFS_PATH }}/gldata"
   glr1conf:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/glr1conf"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_REPO_NFS_HOST }},rw"
+        device: ":{{ DK_REPO_NFS_PATH }}/glr1conf"
   didata:
-    driver: nfs
+    driver: local
     driver_opts:
-      share: "{{ DK_REPO_NFS_HOST }}:{{ DK_REPO_NFS_PATH }}/didata"
+        type: nfs
+        o: "nfsvers=4,addr={{ DK_REPO_NFS_HOST }},rw"
+        device: ":{{ DK_REPO_NFS_PATH }}/didata"
 
 services:
   web:

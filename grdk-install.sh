@@ -50,7 +50,7 @@ fi
 
 # DEFINED ENV VARS
 DK_VERSION=$(cat ./vendor/grdk-core/VERSION)
-DK_DOCKER_VERSION="24.0.7"
+DK_DOCKER_VERSION="29.7.2"
 DK_INSTALL_PATH="${curr_dir}"
 DK_BUILD_PATH="${curr_dir}/build"
 
